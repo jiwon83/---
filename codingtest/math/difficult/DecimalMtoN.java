@@ -1,10 +1,9 @@
 /*
  * 실버 3 , 소수 구하기
  * https://www.acmicpc.net/problem/1929
- * 시도: X(시간초과, 4초) X(2의배수 재거, 시간초과), X,
- * X 답안참고: https://st-lab.tistory.com/81, 
+ * 시도: X(시간초과, 4초) X(2의배수 재거, 시간초과), X, X , X, O
  * 체감 난이도: 어려움,중상
- * 
+ *  답안참고: https://st-lab.tistory.com/81,
  * "에라토스테네스의 체"
  * 소수: 1과 자기 자신만을 인수로 갖는 수 
  * 합성수: 3개 이상(1, 자기자신 포함 )소수의 곱으로 이루어진 수 
@@ -16,19 +15,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
 
-public class Decimal {
+public class DecimalMtoN {
 
-	public static boolean isDecimal(int num) {
-
-		for (int i = 2; i <= Math.sqrt(num); i++) {
-			if (num % i == 0) {
-				return false;
-			}
-
-		}
-
-		return true;
-	}
+//	public static boolean isDecimal(int num) {
+//
+//		for (int i = 2; i <= Math.sqrt(num); i++) {
+//			if (num % i == 0) {
+//				return false;
+//			}
+//
+//		}
+//
+//		return true;
+//	}
 
 	public static boolean[] composite;
 
@@ -53,11 +52,9 @@ public class Decimal {
 	public static void main(String[] args) {
 
 		Scanner sc = new Scanner(System.in);
-
-		String answer = sc.nextLine();
-		String[] arr = answer.split(" ");
-		int M = Integer.parseInt(arr[0]);
-		int N = Integer.parseInt(arr[1]);
+		String [] nums = sc.nextLine().split(" ");
+		int M = Integer.parseInt(nums[0]); 
+		int N = Integer.parseInt(nums[1]);
 
 		final long start = System.nanoTime();
 		
@@ -74,22 +71,7 @@ public class Decimal {
 		System.out.println("소요시간 : " + (end - start) * 1e-9 + " sec");
 		
 
-//		boolean [] check = new boolean [N-M+1]; //합성수인지 체크
-//		
-//		for(int i=M; i<=N; i++) {
-//			
-//			if(check[i-M]==true) { //소수가 아니면, 합성수이면,
-//				continue;
-//			}
-//			if(isDecimal(i)) {	//소수이면 그 배수들을 모두 false
-//				for(int j=i+i; j<=N ;j+=i) {
-//					check[j-M]=true;
-//				}
-//				decimals.add(i);
-//			}
-//			
-//			
-//		}//for
+
 
 
 	}

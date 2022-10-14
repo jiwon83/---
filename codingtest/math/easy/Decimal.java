@@ -8,7 +8,7 @@ package math;
  * 1. : 몫을 넣어야 하는 자리에 나머지를 넣어버렸음.. 꼼꼼히 논리를 확인할 것. 참고 https://st-lab.tistory.com/152
  */
 import java.util.*;
-public class Back11653 {
+public class Decimal {
 	
 	public static int decimal(int num) {
 		int decimalMin=num; //예들들어 6이 들어올 경우 2로 나가야함. 
