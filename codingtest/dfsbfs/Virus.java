@@ -8,7 +8,7 @@ import java.util.StringTokenizer;
 
 /*
  * 바이러스 실버3 https://www.acmicpc.net/problem/2606
- * 시도:X O
+ * 시도:X O X
  * 체감 난이도: 중하
  */
 public class Virus {
