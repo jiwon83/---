@@ -1,88 +1,83 @@
 package DFSBFS;
-/*
- * 다시 풀어볼 것
- * 백준: 유기농 배추 https://www.acmicpc.net/problem/1012
- * X
- * 참고: https://github.com/ndb796/Fast_Campus_Algorithm_Lecture_Notes/blob/master/Solutions/%5B15%5D_2.java
- */
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
+/*
+ * 백준: 유기농 배추 https://www.acmicpc.net/problem/1012
+ * X X
+ * 참고: https://github.com/ndb796/Fast_Campus_Algorithm_Lecture_Notes/blob/master/Solutions/%5B15%5D_2.java
+ */
 public class OrganicCabbage {
-	
 	public static int[][] data = new int [50][50];
 	public static boolean[][] visited = new boolean [50][50];
 	public static int [] dx = {-1,1,0,0};
 	public static int [] dy = {0,0,-1,1};
-	public static int M, N;
-
-	public static void main(String[] args) throws NumberFormatException, IOException {
+	public static int M, N, K, count;
+	
+	
+	public void solve() throws IOException {
 		
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		int r = Integer.parseInt(br.readLine()); //반복 횟수
-		while(r--!=0) {		//if r=3, r= 2,1,0
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			M = Integer.parseInt(st.nextToken()); //M x
-			N = Integer.parseInt(st.nextToken()); //N y
-			int K = Integer.parseInt(st.nextToken()); //N y
-			int result =0;
+		while(r--!=0) {
 			
-			data = new int[50][50];
-			visited = new boolean[50][50];
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			M = Integer.parseInt(st.nextToken()); //M x 가로의 길이 
+			N = Integer.parseInt(st.nextToken()); //N y 세로의 길이 
+			K = Integer.parseInt(st.nextToken()); //
+			data = new int [50][50];
+			visited = new boolean [50][50];
+			count= 0;
 			
 			for(int i=0; i<K; i++) {
 				StringTokenizer st2 = new StringTokenizer(br.readLine());
 				int a = Integer.parseInt(st2.nextToken()); //M x
 				int b = Integer.parseInt(st2.nextToken()); //N y
 				
-				data[a][b]=1;
-								
+				data[a][b]= 1;
 			}
 			
-			for(int i=0; i<N; i++) {
-				for(int j=0; j<M; j++) {
-					if(data[i][j]> 0 && !visited[i][j]) {
-						move(i, j);
-						result++;
+			
+			for(int i=0; i<M; i++) {
+				for(int j=0; j<N; j++) {
+					//dfs 함수는 위아래옆에 1이 있을 경우에만 계속해서 탐색한다. 따라서 반복문으로 다음 1이 있는 지 탐색해 주어야 한다. 
+					if( data[i][j]==1 && !visited[i][j]) { 
+						
+						dfs(i,j);
+						count++;
 					}
 				}
 			}
-			
-			System.out.println(result);
+			System.out.println(count);
 		}
-//		printTupleArr(visited);
-	
-	}
-	public static void move(int x, int y) {
-		//if(visited[x][y]) return;
-		visited[x][y]= true;
 		
-		for(int i=0; i<4; i++) {	//위 , 아래, 우, 좌 노드로 이동
+		
+	}
+	public void dfs(int x, int y) {
+		
+		visited[x][y] = true;
+		
+		for(int i=0; i<4; i++) {
+			int a = x + dx[i];
+			int b = y + dy[i];
 			
-			int nx = x + dx[i];
-			int ny = y + dy[i];
-			
-			if( nx<0 || ny<0 || nx >=N || ny >=M ) {
+			if(a < 0 || a >= M || b <0 || b>= N) {
 				continue;
 			}
-			if( data[nx][ny]==1 && !visited[x][y]) {
-				move(nx,ny);
+			if(data[a][b]==1 && !visited[a][b]) { //null인 경우는 없지 않은가 ??
+				dfs(a,b);
 			}
+			
 		}
-	}
 	
-	private static void printTupleArr(boolean [][] arr) {
-		for (int i = 0; i < arr.length; i++) {
-			for (int j = 0; j < arr[i].length; j++) {
-				if(arr[i][j]==true) {
-					System.out.println(i+":"+j);
-				}
-			}
-			System.out.println();
-		}
+	}
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		OrganicCabbage p = new OrganicCabbage();
+		p.solve();
 
 	}
 
