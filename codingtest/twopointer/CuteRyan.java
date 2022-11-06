@@ -6,14 +6,14 @@ import java.util.StringTokenizer;
 /*
 백준 실버1 귀여운 라이언 https://www.acmicpc.net/problem/15565
 체감 난이도: 중
-시도: X(예제는 잘 나오지만 틀림, 다른 input에서 틀린듯)
-** 현재 틀린 답안. 수정 필요
+시도: X
+
  */
 public class CuteRyan {
 
     static int [] arr;
     static ArrayList<Integer> ones =new ArrayList<>();
-    static int N,K, result;
+    static int N,K;
 
     static void input(){
         FastReader2 scan = new FastReader2();
@@ -26,41 +26,26 @@ public class CuteRyan {
 
     }
     static void pro(){
-        int result=N+1;
-        int cnt=0;
-        int R=1;
+        int result = N+1;
+        int cnt=0, R=0;
         for (int L=1; L<=N; L++){ //L의 이동
-
-            if (arr[L]!=1){
-                continue;
+            //R의 이동
+            while(cnt<K && R<N){
+                R++;
+                if(arr[R]==1){
+//                    ones.add(R);
+                    cnt++;
+                }
             }
-
+            if (cnt==K){
+                result = Math.min(result,(R-L+1));
+            }
             if(arr[L]==1){
-
-                while(cnt<3 && R<=N){
-                    if(arr[R]==1){
-//                        System.out.println("1발견, R="+R);
-                        ones.add(R);
-                        cnt++;
-
-                    }
-                    R++;
-
-                }
-                if (cnt>=3){
-//                    System.out.println("R: "+R+"L: "+L);
-//                    System.out.println("길이: "+(R-L+1-1));
-                    result = Math.min(result,(R-L+1-1));
-                    R--;
-                    cnt -= 2;
-                    //L을 다음 1로 옮겨줌.
-
-                }
+                cnt--;
 
             }
-
-
         }
+        if (result==N+1) result = -1;
         System.out.println(result);
     }
     public static void main(String[] args) {
