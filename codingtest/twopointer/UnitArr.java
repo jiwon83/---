@@ -1,6 +1,9 @@
 import java.io.*;
 import java.util.*;
-
+/*
+골드4 부분합 https://www.acmicpc.net/problem/1806
+시도: X
+*/
 public class Main {
     static int N, S, result;
     static int[] arr;
