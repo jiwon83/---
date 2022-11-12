@@ -1,82 +1,61 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-public class UnitArr {
-    static int [] a;
-    static int [] b;
-    static StringBuilder sb = new StringBuilder();
-    static int N,M;
+public class Main {
+    static int N, S, result;
+    static int[] arr;
+    StringBuilder sb = new StringBuilder();
 
-    static void input(){
-        UnitArr2.FastReader2 scan = new UnitArr2.FastReader2();
+    static void input() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        S = Integer.parseInt(st.nextToken());
+        arr = new int[N + 1];
 
-        N = scan.nextInt();
-        M = scan.nextInt();
-
-        a = new int[N];
-        b = new int[M];
-        for (int i=0; i<N; i++){
-            a[i]= scan.nextInt();
+        st = new StringTokenizer(br.readLine());
+        for (int i = 1; i <= N; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
         }
-        for (int i=0; i<M; i++){
-            b[i]= scan.nextInt();
-        }
-
-
+        br.close();
     }
-    static void pro(){
-        int L =0, R=0;
-        while (true){
-            if (L >= a.length){
-                for (int i=R; i<b.length; i++){
-                    sb.append(b[i]+" ");
-                }
-                break;
-            }
-            if (R >= b.length){
-                for (int i=L; i<a.length; i++){
-//                    System.out.println(i+":"+a[L]);
-                    sb.append(a[i]+" ");
-                }
-                break;
+
+    static void pro() {
+        result = N + 1;
+        int sum = 0, R = 0;
+        for (int L = 1; L <= N; L++) { //L은 1~ N까지 모두 이동
+            sum -= arr[L - 1];
+
+            while (R + 1 <= N && sum < S) { //R은 오른쪽으로만 이동, 각 L에서 sum이 S가 되기 전까지만 이동
+                sum += arr[++R];
             }
 
-            if (a[L]<b[R]) sb.append(a[L++]+" ");
-            else sb.append(b[R++]+" ");
+            if (sum >= S) {
+                result = Math.min(result, R - L + 1);
+
+            }
+
         }
-        System.out.println(sb);
+        if (result == N + 1) {
+            result = 0;
+        }
     }
-    public static void main(String[] args) {
+
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         input();
         pro();
+        bw.write(String.valueOf(result));
+        bw.flush();
+        bw.close();
 
 
-    }
-    static class FastReader2 {
-        BufferedReader br;
-        StringTokenizer st;
+//        bw.write(sb.toString());
+//        bw.flush();//FileWriter 내부 버퍼의 내용을 파일에 writer합니다
+//        bw.close();//스트림을 닫아 종료된 작업에 대한 메모리 확보.
+//        br.close();//스트림을 닫아 종료된 작업에 대한 메모리 확보.
 
-        public FastReader2() {
-            br = new BufferedReader(new InputStreamReader(System.in));
-
-        }
-        String next(){
-
-            while (st == null || !st.hasMoreTokens()){  //현재 남아 있는 토큰이 없다면 새로 받아온다.
-                try {
-                    st = new StringTokenizer(br.readLine());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return st.nextToken();
-        }
-
-        int nextInt(){
-            return Integer.parseInt(next());
-        }
     }
 }
+
