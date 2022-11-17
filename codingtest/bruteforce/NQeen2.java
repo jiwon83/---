@@ -9,7 +9,7 @@ import java.util.Collections;
 
 /*
 골드 4 N-Queen https://www.acmicpc.net/problem/9663
-시도: X (잘 안됨. 강의와 접근을 아예 다르게 했음 수정필요**, X(메모리 초과 값은 잘 나옴)
+시도: X , X(메모리 초과 값은 잘 나옴)
  */
 public class NQeen2 {
     static class Point{
