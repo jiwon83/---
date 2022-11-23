@@ -7,16 +7,18 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /*
-두 용액 https://www.acmicpc.net/problem/2470
-시도 : X
+골드 5 / 두 용액 https://www.acmicpc.net/problem/2470
+시도 : X X
+한 번 더 풀기!!
  */
 public class BOJ2470 {
 
     static int[] arr;
-    static int N, ans;
-    static int[] ansArr = new int[2];
+    static int N, best_sum;
+    static int v1, v2; //항상 v1 < v2
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
+    static StringBuilder sb = new StringBuilder();
 
     static void input() throws IOException {
 
@@ -29,53 +31,59 @@ public class BOJ2470 {
     }
 
     //최적의 합을 만드는 값의 index를 반환하는 이분 탐색 함수
-    //** 비교 대상인 index x는 제외 해야함. 
+    //** 비교 대상인 index x는 제외 해야함.
+    //// 그런 게 없다면 R + 1 을 return 한다 ???
     static int lower_bound(int L, int R, int x) {
 
-        int result = L - 1;
+        int result = R +1 ; //** 아마 모든 값이 X보다 작을 경우 R+1을 리턴할 것이다.
+
         while (L <= R) { //**부등호 조심할 것. L이 R보다 작거나 같은 동안 반복
             int mid = (L + R) / 2;
 
-            if (arr[mid] + x == 0) return mid; //합이 0이면 더 좋은 값이 있을 수 없음.
-            if (L == R) return mid; //다 찾으면
+            if (arr[mid] == x) return mid; //합이 0이면 더 좋은 값이 있을 수 없음.
 
-            if (arr[mid] + x < 0) {
+            if (arr[mid] <  x) {
                 L = mid + 1;
 
             } else {
+                result = mid;
                 R = mid - 1;
             }
         }
-        //아마 이단계로 오지 않을 것임.
         return result;
     }
 
     static void pro() {
-        Arrays.sort(arr, 1, arr.length );//*toIndex이전 인덱스 까지임. 주의
-//        System.out.println(Arrays.toString(arr));
-        ans = Integer.MAX_VALUE;
+        Arrays.sort(arr, 1,N+1 );//*toIndex이전 인덱스 까지임. 주의
+
+        best_sum = Integer.MAX_VALUE;
+        int v1=0, v2=0;
+
         for (int i = 1; i <= N-1; i++) {
             int x = i;
-            int y = lower_bound(x+1, arr.length - 1,arr[x]);
+            int y = lower_bound(x+1, N, -arr[x]);
 
-            int sol_sum = Math.abs(arr[i] + arr[y]);
-            if (sol_sum < ans) {
-                ans = Math.min(ans, sol_sum);
-                ansArr[0] = arr[x];
-                ansArr[1] = arr[y];
-//                System.out.println(x + "/ " + y);
-//                System.out.println("-------");
-//                System.out.println(ansArr[0] + "/ " + ansArr[1]);
-
+            //예외 처리 만약 x=70이고 69와 78이 남았다면, 사실 69와 더 가깝지만 lowerbound 함수의 조건문에 의해 78이 반환된다.
+            //따라서 이문제에서는 최소나 최대가 아니기 때문에 구한 값과 구한값의 인덱스 -1까지도 비교해봐야 하는 것이다.
+            if ( x < y-1  &&  Math.abs(arr[y-1] + arr[x]) < best_sum){
+                best_sum = Math.abs(arr[y-1] + arr[x]);
+                v1 = arr[x];
+                v2 = arr[y-1];
+            }
+            if ( y <= N && Math.abs(arr[y] + arr[x]) < best_sum ){ //만약 R+1이 반환됐다면 OutOfIndexArray발생하기 때문에 범위 조건도 처리해준다.
+                best_sum = Math.abs(arr[y] + arr[x]);
+                v1 = arr[x];
+                v2 = arr[y];
             }
 
         }
-        Arrays.sort(ansArr);
-        System.out.println(ansArr[0] + " " + ansArr[1]);
+        sb.append(v1).append(" ").append(v2);
+
     }
 
     public static void main(String[] args) throws IOException {
         input();
         pro();
+        System.out.println(sb);
     }
 }
