@@ -8,8 +8,9 @@ import java.util.StringTokenizer;
 
 /*
 골드 5 / 두 용액 https://www.acmicpc.net/problem/2470
-시도 : X X
+시도 : X X X
 한 번 더 풀기!!
+코테는 내신이다...!
  */
 public class BOJ2470 {
 
@@ -30,26 +31,29 @@ public class BOJ2470 {
         }
     }
 
-    //최적의 합을 만드는 값의 index를 반환하는 이분 탐색 함수
-    //** 비교 대상인 index x는 제외 해야함.
-    //// 그런 게 없다면 R + 1 을 return 한다 ???
+    // 구하고자 하는 X 이상의 값 중에서 가장 작은 값 선택하면
+    // 그 값 또는 그 값 보다 바로 앞에 있는 값 중에 정답일 것이다.
+    // 그 이유는 X 기준으로 가장 가까운 작은 값과 가장 가까운 큰값 이기 때문이다.
+    //예를 들어 구하고자 하는 값이 2 라고 할때 [ -1 4 98 ]이 있다면 2이상인 값 중 가장 같은 4와 -1중에 하나일 것이다.
+    // 둘 중에 정할 수는 없다. 왜냐하면 이분 탐색에서는 큰 지 작은 지만 보고 얼마나 작은지 얼마나 큰지는 반영할 수 없기 때문이다.
+    // 동시에, 그렇다면 이함수에서 res에 저장하는 값은 x기준 이상인 값만을 저장하기 때문에
+    //만약, 모든 리스트의 값이 x 보다 작다면 (ex, x=99, list =[-1,-2,4,98] ) res는 초기값인 R+1을 반환하게 된다.
+
     static int lower_bound(int L, int R, int x) {
 
         int result = R +1 ; //** 아마 모든 값이 X보다 작을 경우 R+1을 리턴할 것이다.
 
         while (L <= R) { //**부등호 조심할 것. L이 R보다 작거나 같은 동안 반복
-            int mid = (L + R) / 2;
-
-            if (arr[mid] == x) return mid; //합이 0이면 더 좋은 값이 있을 수 없음.
-
-            if (arr[mid] <  x) {
+            int mid = ( L +R ) / 2;
+            if (arr[mid] >= x){
+                result = mid;
+                R = mid -1;
+            }else {
                 L = mid + 1;
 
-            } else {
-                result = mid;
-                R = mid - 1;
             }
-        }
+         }
+        System.out.println("x= "+ x+ " result = "+ result);
         return result;
     }
 
@@ -63,15 +67,15 @@ public class BOJ2470 {
             int x = i;
             int y = lower_bound(x+1, N, -arr[x]);
 
-            //예외 처리 만약 x=70이고 69와 78이 남았다면, 사실 69와 더 가깝지만 lowerbound 함수의 조건문에 의해 78이 반환된다.
-            //따라서 이문제에서는 최소나 최대가 아니기 때문에 구한 값과 구한값의 인덱스 -1까지도 비교해봐야 하는 것이다.
-            if ( x < y-1  &&  Math.abs(arr[y-1] + arr[x]) < best_sum){
+            //만약 y = N+1 이라면, 이 if문에 들어오게 된다. 그렇지 않더라도 이 if문에 들어오게 된다.
+            if ( x <y-1 &&  Math.abs(arr[x] + arr[y-1]) < best_sum ){
                 best_sum = Math.abs(arr[y-1] + arr[x]);
                 v1 = arr[x];
                 v2 = arr[y-1];
             }
-            if ( y <= N && Math.abs(arr[y] + arr[x]) < best_sum ){ //만약 R+1이 반환됐다면 OutOfIndexArray발생하기 때문에 범위 조건도 처리해준다.
-                best_sum = Math.abs(arr[y] + arr[x]);
+            //만약 y <= N 이라면, 구하려는 x보다 작은 값이 하나 이상 있어서 result값이 제대로 나온 것.
+            if (y <= N && Math.abs(arr[x] + arr[y]) < best_sum ) {
+                best_sum = Math.abs(arr[x] + arr[y]);
                 v1 = arr[x];
                 v2 = arr[y];
             }
