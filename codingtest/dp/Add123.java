@@ -1,51 +1,48 @@
 package dp;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 /*
-dp 완전 기초 1+2+3으로 더하기
-https://www.acmicpc.net/problem/9095
+실버 3 / 1, 2, 3 더하기 https://www.acmicpc.net/problem/9095
+dp 버전
+시도 : O
  */
-public class Add {
-    static int N, T;
-    static int [] Dy;
+public class Add123 {
+    static int T, N;
+    static int [] dy;
     static FastReader sc = new FastReader();
-    static StringBuilder sb = new StringBuilder();
+    static StringBuilder sb =  new StringBuilder();
 
-    static void input(){
-        N = sc.nextInt();
+    private static void dp() {
+        dy[1] = 1;
+        if (N >=2) dy[2] = 2; //유의
+        if (N >=3) dy[3] = 4;
+
+        for (int i=4; i<=N; i++) dy[i]= dy[i-1] + dy[i-2]+ dy[i-3];
     }
-    static void pro(){
-
-        Dy = new int[11];
-        preprocess();
+    static void pro() {
 
         T = sc.nextInt();
         while (T-- >0){
-            input();
-            sb.append(Dy[N]).append('\n');
+            N = sc.nextInt();
+            dy = new int[N+1];
+            dp();
+            sb.append(dy[N]).append('\n');
 
         }
-        sc.close();//스트림을 닫아 종료된 작업에 대한 메모리 확보.
         System.out.println(sb);
-    }
 
-    static void preprocess(){
-        //초기값 지정
-        Dy[1]=1;
-        Dy[2]=2;
-        Dy[3]=4;
-        //값 넣어주기>for문
-        for (int i=4; i<=10; i++){
-            Dy[i] = Dy[i-3]+ Dy[i-2]+ Dy[i-1];
-        }
 
     }
+
+
+
     public static void main(String[] args) {
+
         pro();
+        sc.close();//스트림을 닫아 종료된 작업에 대한 메모리 확보.
     }
     static class FastReader {
             BufferedReader br;
