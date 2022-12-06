@@ -41,7 +41,8 @@ public class BOJ2470 {
 
     static int lower_bound(int L, int R, int x) {
 
-        int result = R +1 ; //** 아마 모든 값이 X보다 작을 경우 R+1을 리턴할 것이다.
+//        int result = R +1 ; //** 아마 모든 값이 X보다 작을 경우 R+1을 리턴할 것이다.
+        int result = R; //** 아마 모든 값이 X보다 작을 경우 R+1을 리턴할 것이다.
 
         while (L <= R) { //**부등호 조심할 것. L이 R보다 작거나 같은 동안 반복
             int mid = ( L +R ) / 2;
@@ -53,7 +54,7 @@ public class BOJ2470 {
 
             }
          }
-        System.out.println("x= "+ x+ " result = "+ result);
+
         return result;
     }
 
@@ -73,6 +74,7 @@ public class BOJ2470 {
                 v1 = arr[x];
                 v2 = arr[y-1];
             }
+
             //만약 y <= N 이라면, 구하려는 x보다 작은 값이 하나 이상 있어서 result값이 제대로 나온 것.
             if (y <= N && Math.abs(arr[x] + arr[y]) < best_sum ) {
                 best_sum = Math.abs(arr[x] + arr[y]);
