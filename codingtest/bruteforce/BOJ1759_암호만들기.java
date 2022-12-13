@@ -1,45 +1,59 @@
 package bruteforce;
 
+import naver.Day22_12_03.Test;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.StringTokenizer;
-
+/*
+https://www.acmicpc.net/problem/1759
+ 한번 더 풀어보기
+ */
 public class BOJ1759_암호만들기 {
-    static int N, M;
+    static int M,N;
+    static String [] A;
+    static int [] selected;
+    static int consonant, vowel;
     static StringBuilder sb = new StringBuilder();
-    static String[] selected, alpha, least;
-    static ArrayList<Integer> vowels, consnants; //이들의 인덱스를 저장
-    static boolean[] used;
+    static FastReader sc = new FastReader();
 
     static void input() {
-        FastReader scan = new FastReader();
-        M = scan.nextInt();
-        N = scan.nextInt();
-
-        selected = new String[M + 1];
-        alpha = new String[N + 1];
-        used = new boolean[N + 1];
-        vowels = new ArrayList<>();
-        consnants = new ArrayList<>();
-        for (int i = 1; i <= N; i++) {
-            alpha[i] = scan.next();
+        M = sc.nextInt();
+        N= sc.nextInt();
+        A = new String[N+1];
+        selected = new int[M+1];
+        for (int i=1; i<= N; i++){
+            A[i] = sc.next();
         }
-        Arrays.sort(alpha, 1, N + 1); //정렬
-        // 이걸 자음 모음으로 나눈다.
-        for (int i = 1; i <= N; i++) {
-            if (isVowel(alpha[i])) {
-                vowels.add(i);
-            } else {
-                consnants.add(i);
-            }
-        }
-        System.out.println(Collections.unmodifiableList(vowels));
-        System.out.println(Collections.unmodifiableList(consnants));
 
     }
+    static void recur(int k){
+        if (k == M+1){
+            //자음의 갯수와 모음의 갯수를 count
+            vowel=0; consonant =0;
+//            System.out.println(Arrays.toString(selected));
+            for (int i=1; i<=M; i++){
+                if (isVowel(A[ selected[i] ])){ //모음이라면
+                    vowel++;
+                }else consonant++;
 
+            }
+            if (consonant>=2 && vowel >=1){ //조건을 충족하면
+                for (int i=1; i<=M; i++) sb.append(A[selected[i]]);
+                sb.append("\n");
+            }
+            return;
+        }
+        for (int cand = selected[k-1]+1; cand <=N; cand++){
+            selected[k] = cand;
+            recur(k+1);
+            selected[k] =0;
+
+        }
+
+    }
     static public boolean isVowel(String s) {
         boolean tf = false;
         if (s.equals("a") || s.equals("e") || s.equals("i") || s.equals("o") || s.equals("u")) {
@@ -47,72 +61,27 @@ public class BOJ1759_암호만들기 {
         }
         return tf;
     }
+    static void pro() {
 
+        Arrays.sort(A, 1, N+1);
+        recur(1);
+        System.out.println(sb);
 
-    static void recur(int k, int beginIdx) {
-        if (k == 4) { // 1 ~ 3 번째를 전부 다 골랐다!
-//            System.out.println(Arrays.toString(selected));
-            leftover(4);
-        } else if ( k == 1 ){ //모음을 고른다.
-            for (int i=0; i<vowels.size();i++){
-                selected[k] = alpha[vowels.get(i)];//a
-                used[vowels.get(i)]=true;
-                recur(k+1,0); //항상 1이다. ArrayList이기 때문에 0이다.
-                used[consnants.get(i)] = false;
-            }
-        } else if (k>1 && k<4) {
-            //자음을 고른다.
-            for (int i= beginIdx; i<consnants.size(); i++ ){
-                selected[k] = alpha[consnants.get(i)]; //c,s,t,w
-                used[consnants.get(i)] = true;
-                recur(k+1, i+1);
-                used[consnants.get(i)] = false;
-            }
-
-        }
     }
-    static void leftover(int k) {
-        if (k == M+1) { // 1 ~ 3 번째를 전부 다 골랐다!
-            System.out.println(Arrays.toString(selected));
-            String [] temp =new String[M];
-            for (int i = 1; i <= M; i++) temp[i-1]=selected[i]; //sb.append(selected[i]);
-            Arrays.sort(temp);
-            for (int i=0; i<M; i++) sb.append(temp[i]);
-            sb.append('\n');
-
-        } else { //전체에서 방문하지 않은 것들을 또 조합한다.
-            for (int i=1; i<=N; i++){
-                if (!used[i]){
-                    selected[k] = alpha[i];
-                    used[i] = true;
-                    leftover(k+1);
-                    used[i] = false;
-                }
-            }
-        }
-    }
-
     public static void main(String[] args) {
         input();
-        recur(1,1);
-        System.out.println(sb);
+        pro();
     }
-
-
     static class FastReader {
         BufferedReader br;
         StringTokenizer st;
 
         public FastReader() {
             br = new BufferedReader(new InputStreamReader(System.in));
-        }
 
-        public FastReader(String s) throws FileNotFoundException {
-            br = new BufferedReader(new FileReader(new File(s)));
         }
-
-        String next() {
-            while (st == null || !st.hasMoreElements()) {
+        String next(){
+            while (st == null || !st.hasMoreTokens()){  //현재 남아 있는 토큰이 없다면 새로 받아온다.
                 try {
                     st = new StringTokenizer(br.readLine());
                 } catch (IOException e) {
@@ -122,26 +91,30 @@ public class BOJ1759_암호만들기 {
             return st.nextToken();
         }
 
-        int nextInt() {
+        int nextInt(){
             return Integer.parseInt(next());
         }
+        long nextLong(){return Long.parseLong(next()); }
 
-        long nextLong() {
-            return Long.parseLong(next());
-        }
+        double nextDouble(){return Double.parseDouble(next());}
 
-        double nextDouble() {
-            return Double.parseDouble(next());
-        }
-
-        String nextLine() {
-            String str = "";
+        String nextLine(){
+            String str ="";
             try {
                 str = br.readLine();
-            } catch (IOException e) {
+
+            }catch (IOException e){
                 e.printStackTrace();
             }
             return str;
         }
+        void close() {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }
