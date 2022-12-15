@@ -3,66 +3,57 @@ package sorting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
-/*
-문자열 압축 https://school.programmers.co.kr/learn/courses/30/lessons/60057
- */
 public class Pro_튜플 {
-    /*
-        Todo : 변수 선언
-         */
+
 
     static StringBuilder sb = new StringBuilder();
-
+    static String [] groups;
     /* 필요한 함수들 */
 
-    static public ArrayList<Integer> solution(String s) {
-        int[] answer = {};
+    public static List<Integer> solution(String s) {
 
-        ArrayList<Integer> result = new ArrayList<>();
+        //1. s를 나눈다.
+        s = s.substring(2, s.length()-2).replace("},{", "-");
+        groups= s.split("-");
 
-        //1. { 전체 제거
-        s = s.replaceAll("\\{","");
-        //2. } 로 split
-        String [] group = s.split("}");
-
-        // grup 정렬 : 크기의 오름차순
-        Arrays.sort(group, new Comparator<String>(){
-            public int compare(String o1, String o2){
-                return Integer.compare(o1.length(), o2.length());
+        //2. 배열을 길이 순으로 정렬한다.
+        Arrays.sort(groups, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.length() - o2.length();
             }
         });
 
-        //부분 집합 앞의 , 를 제거
-        for (int i=0; i< group.length; i++){
-
-            if (group[i].charAt(0)==','){
-                group[i] = group[i].substring(1);
-            }
-        }
-
-        //분리된 부분 집합인 group을 순회
-        for (int i=0; i< group.length; i++){
-
-            String [] inGroup = group[i].split(","); //부분 집합을 , 로 split해 원소들을 나눈다.
-
-            for (int j=0; j<inGroup.length; j++){
-                if (!result.contains( Integer.valueOf( inGroup[j] ))){  //이전에 없던 수라면
-                    result.add(Integer.valueOf(inGroup[j])); //추가.
+        //3.튜플 배열을 순서대로 처리한다
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i=0; i< groups.length; i++){
+            String [] temp = groups[i].split(",");
+            for (int j=0; j< temp.length; j++){
+                if (temp[j].length()==0) continue;
+                if (list.indexOf(Integer.valueOf( temp[j] ) )==-1){
+                    list.add( Integer.valueOf(temp[j]));
                 }
             }
-
         }
-            return result;
-//        answer = result.toArray();
-//        return answer;
+        //중복확인한다.
+        return list;
+    }
+    public int [] convert(List<Integer> list){
+        int[] primitive = list.stream()
+                .mapToInt(Integer::intValue)
+                .toArray();
+        return primitive;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(solution("{{1,2,3},{2,1},{1,2,4,3},{2}}"));
+        System.out.println(solution("{{4,2,3},{3},{2,3,4,1},{2,3}}"));
 
     }
+
+
 
 
 }
