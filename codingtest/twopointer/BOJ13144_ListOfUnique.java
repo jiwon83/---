@@ -3,57 +3,44 @@ package twopointer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 public class BOJ13144_ListOfUnique {
+
     static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
     static int N;
-    static long ans;
     static int [] A;
+    static int [] cnt =new int[100001];
+    static long ans=0L;
+
     static void input() {
         N = sc.nextInt();
         A = new int[N+1];
-
         for (int i=1; i<=N; i++){
             A[i] = sc.nextInt();
         }
     }
+
     static void pro() {
-        find(A);
-        System.out.println(ans);
-    }
 
-    private static void find(int[] a) {
-        int R=0;
-        for (int L =1; L <=N; L++){
-            //R이동
-            R = L;
-            while (R <= N){
+        for (int L =1, R=0; L <=N; L++){
+//            System.out.println("L="+L+" R="+ R);
 
-//                int[] destArray = new int[R - L + 1 + 1];
-                int[] destArray = new int[R - L + 1 ];
-                System.arraycopy(a, L, destArray, 0, R-L+1);
-                if (check(destArray)){
-//                    System.out.println(Arrays.toString(destArray));
-                    ans++;
-                }
-                R++;
+            while ( R+1 <=N && cnt[A[R+1]] < 1){ //R을 옮겨도 괜찮은지 확인 다음 수의 cnt값이 1보다 작아야 한다.
+                cnt[ A[++R] ]++;
+//                System.out.println("L= "+L+" , R= "+R);
+
             }
+            //ans 갱신
+//            System.out.println( R - L +1+" 이 더해짐.");
+            ans += R - L +1;
+            //L 이동
+            cnt[ A[L] ]--;
         }
-    }
+        System.out.println(ans);
 
-    private static boolean check(int[] destArray) {
-        //index 1부터 사용
-        //1. set으로 변환
-        Set<Integer> set = new HashSet<Integer>(Arrays.stream(destArray).boxed().collect(Collectors.toList()));
-        return set.size()==destArray.length? true: false;
     }
-
     public static void main(String[] args) {
         input();
         pro();
@@ -103,4 +90,5 @@ public class BOJ13144_ListOfUnique {
             }
 
         }
+
 }
