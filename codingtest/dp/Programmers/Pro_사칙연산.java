@@ -2,28 +2,26 @@ class Solution {
     String [] opers;
     int [] nums;
     int [][][] dp = new int [2][101][101]; //0= 최대, 1=최소
+    int MIN = Integer.MIN_VALUE;
+    int MAX = Integer.MAX_VALUE;
     
     public int recur(int type, int startIdx, int endIdx){ //최대값을 return
         if(startIdx == endIdx){
             return dp[0][startIdx][endIdx];
         }
-        if(dp[type][startIdx][endIdx] != Integer.MAX_VALUE && dp[type][startIdx][endIdx] != Integer.MIN_VALUE){
+        if(dp[type][startIdx][endIdx] != MAX && dp[type][startIdx][endIdx] != MIN){
             return dp[type][startIdx][endIdx];
         }
+        
+        int result = (type == 0) ? MIN : MAX;
         if(type==0){ //max
             for(int oper = startIdx; oper < endIdx; oper++){
                 int splitIdx = oper;
                 if(opers[oper].equals("-")){
-                    dp[type][startIdx][endIdx] 
-                        = Math.max( dp[type][startIdx][endIdx] ,
-                                   recur(0, startIdx, splitIdx) - recur(1, splitIdx+ 1, endIdx)
-                                   );
+                    result = Math.max (result, recur(0, startIdx, splitIdx) - recur(1, splitIdx+ 1, endIdx) );
                 }
                 if(opers[oper].equals("+")){
-                    dp[type][startIdx][endIdx]
-                        = Math.max (dp[type][startIdx][endIdx], 
-                                    recur(0, startIdx, splitIdx) + recur(0, splitIdx+ 1, endIdx)
-                                    );
+                    result = Math.max( result, recur(0, startIdx, splitIdx) + recur(0, splitIdx+ 1, endIdx));
                 }
                 
             }//for
@@ -31,21 +29,15 @@ class Solution {
             for(int oper = startIdx; oper < endIdx; oper++){
                 int splitIdx = oper;
                 if(opers[oper].equals("-")){
-                    dp[type][startIdx][endIdx] 
-                        = Math.min( dp[type][startIdx][endIdx] , 
-                                   recur(1, startIdx, splitIdx) - recur(0, splitIdx+ 1, endIdx)
-                                   );
+                    result = Math.min(result, recur(1, startIdx, splitIdx) - recur(0, splitIdx+ 1, endIdx) );
                 }
                 if(opers[oper].equals("+")){
-                    dp[type][startIdx][endIdx] 
-                        = Math.min(dp[type][startIdx][endIdx] ,
-                                   recur(1, startIdx, splitIdx) + recur(1, splitIdx+ 1, endIdx)
-                                   );
+                    result = Math.min(result, recur(1, startIdx, splitIdx) + recur(1, splitIdx+ 1, endIdx) );
                 }
                 
             }//for
         }
-        
+        dp[type][startIdx][endIdx] = result;
         return dp[type][startIdx][endIdx];
         
     }
