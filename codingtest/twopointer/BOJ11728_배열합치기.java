@@ -3,48 +3,43 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class Main {
+    static int N, M;
+    static int [] A , B;
     static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
-    static int N, M;
-    static int [] A, B;
-    static HashSet<Integer> set = new HashSet<>();
+
     static void input() {
-        N= sc.nextInt();
-        M=sc.nextInt();
-        A = new int[N];
-        B= new int[M];
-        for (int i=0; i<N; i++){
-            A[i] =  sc.nextInt();
-        }
-        for (int i=0; i<M; i++){
-            B[i] = sc.nextInt();
-        }
+          N = sc.nextInt();
+          M = sc.nextInt();
+          A = new int[N];
+          B= new int[M];
 
+          for (int i=0; i<N; i++){
+              A[i] = sc.nextInt();
 
-
-//        A = Stream.of(a.split(" ")).mapToInt(Integer::parseInt).boxed().toArray(Integer[]::new);
-
+          }
+          for (int i=0; i<M; i++){
+              B[i] = sc.nextInt();
+          }
     }
     static void pro() {
-        int L = 0;
-        int R = 0;
-        while (L <N && R <M){
+        int L =0, R=0;
+        while (L < N && R <M){
             if (A[L] <= B[R]){
-                sb.append(A[L]).append(" ");
-                L++;
-            }else{
-                sb.append(B[R]).append(" ");
-                R++;
+                sb.append(A[L++]).append(" ");
+            }
+            else if (A[L] > B[R]){
+                sb.append(B[R++]).append(" ");
             }
         }
-        for (int i=L ; i<N; i++){
-            sb.append(A[i]).append(" ");
+        while(L < N){
+            sb.append(A[L++]).append(" ");
         }
-        for (int i=R ; i<M; i++){
-            sb.append(B[i]).append(" ");
+        while(R < M){
+            sb.append(B[R++]).append(" ");
         }
-        System.out.println(sb);
 
+        System.out.println(sb);
     }
     public static void main(String[] args) {
         input();
@@ -97,7 +92,3 @@ public class Main {
         }
 
 }
-
-
-
-
