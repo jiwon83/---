@@ -1,68 +1,52 @@
-package tree;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-public class BOJ1068_트리 {
-    static ArrayList<Integer>[] graph;
-    static int N, R, count;
-    static int [] parentsInfo;
-    static ArrayList<Integer> roots;
+public class Main {
+
     static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
-
+    static int N, root, remove;
+    static int [] A;
+    static ArrayList<Integer> [] graph;
+    
     static void input() {
-        //N, R, graph, roots
-        N  = sc.nextInt();
-        //초기화
+        N = sc.nextInt();
         graph = new ArrayList[N];
-        parentsInfo = new int[N];
-        roots = new ArrayList<>();
-        for (int i=0; i<N; i++) graph[i]= new ArrayList<>();
+        A = new int[N];
+        for (int i = 0; i < N; i++) graph[i] = new ArrayList<>();
 
-        //일단 parents정보를 받는다.
-        for (int i=0; i<N; i++){
-            parentsInfo[i] = sc.nextInt();
+        for (int i = 0; i < N; i++) {
+            A[i] = sc.nextInt();
+            if (A[i]==-1) root = i;
         }
+        remove = sc.nextInt();
+        A[remove] = -1; //romove의 부모 삭제
 
-        //R remove
-        R = sc.nextInt();
-        //parentsInfo에서 삭제. 임의의 값으로 변경
-        parentsInfo[R] = N+1;
-
-        //parentsInfo를 기반으로 graph를 생성하고 roots 정보 넣는다.
-        for (int i=0; i<N; i++){
-            int parent = parentsInfo[i];
-            if(parent== -1) {
-                roots.add(i);
-                continue;
-            }
-            if (parent == N+1) { //삭제된 노드임
-                continue;
-            }
-            graph[parent].add(i);
-        }
-
-    }
-
-    static void dfs(int node) {
-
-        if (graph[node].size() == 0) {  // 만약 leaf 노드가 0이라면 count up!
-            count++;
-        }
-        for (int x : graph[node]) { //그래프에서 node에 이어진 곳을 탐색
-            dfs(x);
+        //그래프 작성
+        for(int i=0; i<N; i++){
+            if (A[i]==-1) continue;
+            int child = i;
+            int parent = A[i];
+            graph[parent].add(child);
         }
     }
-
+    static int recur(int x){
+        boolean cango=false;
+        int result =0;
+        for (int y : graph[x]){
+            result += recur(y);
+            cango = true;
+        }
+        if(!cango) return 1;
+        return result;
+    }
     static void pro() {
-        for (int startNode : roots){
-            dfs(startNode); //0
+        if(root==remove) System.out.println(0);
+        else{
+            System.out.println(recur(root));
         }
-        System.out.println(count);
+
     }
 
     public static void main(String[] args) {
@@ -122,5 +106,4 @@ public class BOJ1068_트리 {
         }
 
     }
-
 }
