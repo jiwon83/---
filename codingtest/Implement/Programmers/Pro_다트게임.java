@@ -1,53 +1,45 @@
+import java.util.*;
 class Solution {
-    String bonus = "SDT";
-    String option = "*#";
     
-    double cal (String num, char bonus){
-        double num1 = Double.parseDouble(num);
+    int cal (String num, char bonus){
+        int num1 = Integer.parseInt(num);
         if(bonus=='S'){
-            return Math.pow(num1, 1);
+            return (int) Math.pow(num1, 1);
         }else if(bonus=='D'){
-            return Math.pow(num1, 2);
+            return (int) Math.pow(num1, 2);
         }else if(bonus=='T'){
-            return Math.pow(num1, 3);
+            return (int) Math.pow(num1, 3);
         }//else if(bonus=='T') 
         return -1;
     }
     
-    public double solution(String dartResult) {
-        double answer = 0;
+    public int solution(String dartResult) {
+        int answer = 0;
+        int[] ans= new int[3];
+        int ansIdx=0;
+        
         //세트당 자르고
-       
+        String tmp="";
         for(int i=0; i< dartResult.length(); i++){
-            int j= i+1;
-            while( j+1 < dartResult.length() 
-                  && !Character.isDigit(dartResult.charAt(j+1)) ){
-                j++;
-            }
-            //System.out.println(dartResult.substring(i,j+1));//ok
-            //점수 보너스/ 옵션으로 나눈다.
-            String temp = dartResult.substring(i,j+1);
-            if(dartResult.charAt(j)=='#' || dartResult.charAt(j)=='*'){
-                System.out.println("포함,,"+ temp);
-                if(dartResult.charAt(j)=='#'){
-                    answer += - cal(dartResult.substring(i,j-1), dartResult.charAt(j-1));
-                }else{
-                    answer += cal(dartResult.substring(i,j-1), dartResult.charAt(j-1));
-                    answer *= 2;
-                }
-            }else{
-                System.out.println("비포함,,"+ temp);
-                answer += cal(dartResult.substring(i,j), dartResult.charAt(j));
-                //뒤는 bonus 앞은 숫자
-            }
-            //옵션이 있다면 각각에 맞게 처리
-            //없다면 점수와 보너스만 처리
-            //anser에 갱신.
+            char c = dartResult.charAt(i);
             
-            i = j;
+            if('0'<= c && c <= '9'){
+                tmp+=c+"";
+            }else if(c=='S' || c=='D' || c=='T'){
+                ans[ansIdx++] =cal(tmp, c);
+                tmp="";
+            }else if(c=='*'){
+                if(ansIdx-2 >= 0) ans[ansIdx-2] *=2;
+                ans[ansIdx-1] *=2;
+            }else if(c=='#'){
+                ans[ansIdx-1] *= -1;
+            }
+            
         }
         
-        
+        for(int i : ans ){
+            answer += i;
+        }
         return answer;
     }
 }
