@@ -1,70 +1,70 @@
+import java.util.*;
 class Solution {
-    String [] opers;
-    int [] nums;
-    int [][][] dp = new int [2][101][101]; //0= 최대, 1=최소
-    int MIN = Integer.MIN_VALUE;
-    int MAX = Integer.MAX_VALUE;
-    
-    public int recur(int type, int startIdx, int endIdx){ //최대값을 return
-        if(startIdx == endIdx){
-            return dp[0][startIdx][endIdx];
-        }
-        if(dp[type][startIdx][endIdx] != MAX && dp[type][startIdx][endIdx] != MIN){
-            return dp[type][startIdx][endIdx];
+    final int MAX = Integer.MAX_VALUE;
+    final int MIN = Integer.MIN_VALUE;
+    public int [][][] dp;
+    public int [] numbers;
+    public int [] opers; //0= +, 1= -
+    public int recur(int a, int b, int flag){ //a=start, b=end, val = max or min
+        
+        if(a==b || dp[flag][a][b] != MAX ){ //이미 구한 값이 있다면
+            return dp[flag][a][b];
         }
         
-        int result = (type == 0) ? MIN : MAX;
-        if(type==0){ //max
-            for(int oper = startIdx; oper < endIdx; oper++){
-                int splitIdx = oper;
-                if(opers[oper].equals("-")){
-                    result = Math.max (result, recur(0, startIdx, splitIdx) - recur(1, splitIdx+ 1, endIdx) );
+        int result = flag==0 ? MIN: MAX; 
+ 
+        if(flag==0){ //max
+            for(int sp=a; sp<b; sp++){
+                int oper = opers[sp];
+                if(oper==0){//+
+                    result = Math.max(result, recur(a,sp,0) + recur(sp+1,b,0));
+                    
+                }else{ //-
+                    result = Math.max(result, recur(a,sp,0) - recur(sp+1,b,1));   
                 }
-                if(opers[oper].equals("+")){
-                    result = Math.max( result, recur(0, startIdx, splitIdx) + recur(0, splitIdx+ 1, endIdx));
+            }
+        }else{ //min
+            for(int sp=a; sp<b; sp++){
+                int oper = opers[sp];
+                if(oper==0){//+
+                    result = Math.min( result, recur(a,sp,1) + recur(sp+1,b,1));
+                }else{ //-
+                    result = Math.min( result, recur(a,sp,1) - recur(sp+1,b,0));
                 }
-                
-            }//for
-        }else if(type==1){ //min
-            for(int oper = startIdx; oper < endIdx; oper++){
-                int splitIdx = oper;
-                if(opers[oper].equals("-")){
-                    result = Math.min(result, recur(1, startIdx, splitIdx) - recur(0, splitIdx+ 1, endIdx) );
-                }
-                if(opers[oper].equals("+")){
-                    result = Math.min(result, recur(1, startIdx, splitIdx) + recur(1, splitIdx+ 1, endIdx) );
-                }
-                
-            }//for
+            } 
         }
-        dp[type][startIdx][endIdx] = result;
-        return dp[type][startIdx][endIdx];
-        
+        dp[flag][a][b] = result;
+        return result;
     }
     public int solution(String arr[]) {
-        /** nums & opers 분리*/
-        nums = new int[arr.length/2+1];
-        opers = new String [arr.length/2];
+        // int answer = -1;
+        numbers = new int[arr.length/2+1];
+        opers = new int[arr.length/2];
+        dp = new int [2][numbers.length][numbers.length];
+        //1. arr 분리 
         for(int i=0; i<arr.length; i++){
-            if(i % 2==0){
-                nums[i/2]= Integer.parseInt( arr[i] );
-            }else{
-                opers[i/2] = arr[i];
+            if(i % 2==0 ) numbers[i/2] = Integer.parseInt(arr[i]);
+            else {
+                opers[i/2] = arr[i].equals("+")? 0 : 1;
             }
         }
-        /* dp 배열 초기화 */
-        for(int i=0; i<nums.length; i++){
-            for(int j=0; j<nums.length; j++){
-                dp[0][i][j] = Integer.MIN_VALUE;
+ 
+        //1-2. dp 초기화
+        for(int i=0; i<numbers.length; i++){
+            for(int j=0; j<numbers.length; j++){
+                dp[0][i][j] = MAX;
                 dp[1][i][j] = Integer.MAX_VALUE;
             }
         }
-        /* 자기자신 값 넣어주기 dp 초기화 */
-        for(int i=0; i< nums.length; i++){
-            dp[0][i][i] = nums[i];
-            dp[1][i][i] = nums[i];
+        
+        for(int i=0; i<numbers.length; i++){
+            dp[0][i][i] = numbers[i];
+            dp[1][i][i] = numbers[i];
         }
         
-        return recur(0, 0, arr.length/2);
+        //2. return recur
+        int answer =  recur(0, numbers.length-1, 0);
+
+        return answer;
     }
 }
