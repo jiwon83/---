@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
+    static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
     static Queue<Integer> q = new LinkedList<>();
     static Queue<Integer> assistQ = new LinkedList<>();
@@ -25,6 +25,7 @@ public class Main {
                 }
             }
         }
+
     }
     static int [][] dir = {{1,0,0}, {-1,0,0}, {0,1,0}, {0,-1,0},{0,0,-1},{0,0,1}};
     static void bfs(){
@@ -49,8 +50,8 @@ public class Main {
     }
     static void pro() {
         while (true){
-            if ( q.isEmpty()) {
-                if (notYet != 0 ){
+            if (notYet==0 || q.isEmpty()) {
+                if (q.isEmpty() && notYet!=0) {
                     System.out.println(-1);
                     break;
                 }
@@ -66,6 +67,7 @@ public class Main {
                     q.add(iter.next());
                 }
                 assistQ = new LinkedList<>();
+
             }
         }
 
@@ -75,48 +77,48 @@ public class Main {
         pro();
     }
     static class FastReader {
-            BufferedReader br;
-            StringTokenizer st;
+        BufferedReader br;
+        StringTokenizer st;
 
-            public FastReader() {
-                br = new BufferedReader(new InputStreamReader(System.in));
+        public FastReader() {
+            br = new BufferedReader(new InputStreamReader(System.in));
 
-            }
-            String next(){
-                while (st == null || !st.hasMoreTokens()){  //현재 남아 있는 토큰이 없다면 새로 받아온다.
-                    try {
-                        st = new StringTokenizer(br.readLine());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return st.nextToken();
-            }
-
-            int nextInt(){
-                return Integer.parseInt(next());
-            }
-            long nextLong(){return Long.parseLong(next()); }
-
-            double nextDouble(){return Double.parseDouble(next());}
-
-            String nextLine(){
-                String str ="";
+        }
+        String next(){
+            while (st == null || !st.hasMoreTokens()){  //현재 남아 있는 토큰이 없다면 새로 받아온다.
                 try {
-                    str = br.readLine();
-
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-                return str;
-            }
-            void close() {
-                try {
-                    br.close();
+                    st = new StringTokenizer(br.readLine());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-
+            return st.nextToken();
         }
+
+        int nextInt(){
+            return Integer.parseInt(next());
+        }
+        long nextLong(){return Long.parseLong(next()); }
+
+        double nextDouble(){return Double.parseDouble(next());}
+
+        String nextLine(){
+            String str ="";
+            try {
+                str = br.readLine();
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            return str;
+        }
+        void close() {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 }
