@@ -1,48 +1,42 @@
-
 import java.io.*;
 import java.util.*;
 
 public class Main {
     static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
-    static long max_value;
     static int N;
-    static long [] A;
-//    static long [] cnt; 원래 의도는 인덱스가 0~ long의 최대 크기만큼 만드는 것이었으나, 그렇게는 불가능.
+
+    static long [][] dp;
+    static long [] nums;
+
     static void input() {
-
-        max_value = Long.MIN_VALUE;
-
-        N = sc.nextInt();
-        A = new long[N];
-
+        N= sc.nextInt();
+        nums = new long[N];
+        dp =new long[N][3];
         for (int i=0; i<N; i++){
-            A[i] = sc.nextLong();
+            nums[i] = sc.nextInt();
         }
-        Arrays.sort(A);
-        int cnt=1; long pre=A[0]; int max_cnt = 0;
-        for (int i=1; i<N; i++){
-            //만약 이전과 숫자가 같다면 cnt++
-            //그렇지 않다면 이전 cnt 를 max_count_value에 갱신 cnt 초기화, \
-            if(A[i] == pre) cnt ++;
-            else {
-                if(max_cnt < cnt) {
-                    max_cnt = cnt;  max_value = pre;
-                }
-                cnt =1;
-            }
-            pre=A[i];
+
+        Arrays.sort(nums);
+
+        dp[0][0] = 1; dp[0][1]=1; dp[0][2] = nums[0];
+        for(int i=1; i<N; i++){
+            dp[i][0] = nums[i]==nums[i-1]? dp[i-1][0]+1 : 1;
+            dp[i][1] = (dp[i-1][1] < dp[i][0])? dp[i][1] = dp[i][0]: dp[i-1][1]; //현재 연속 값이 최대 연속값보다 크다면
+            dp[i][2] = (dp[i-1][1] < dp[i][0])? nums[i] : dp[i-1][2];
 
         }
-        //마지막 숫자 갱신
-        if(max_cnt < cnt) {
-            max_value = pre;
-        }
-        System.out.println(max_value);
+
+//        System.out.println(Arrays.deepToString(dp));
+        System.out.println(dp[N-1][2]);
+
+    }
+    static void pro() {
 
     }
     public static void main(String[] args) {
         input();
+        pro();
     }
     static class FastReader {
             BufferedReader br;
