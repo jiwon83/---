@@ -5,32 +5,39 @@ public class Main {
     static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
     static int N;
-    static Set<String> set = new HashSet<>();
+    static HashMap<String, Integer> hm = new HashMap<>();
+
+    static class File implements Comparable<File> {
+        String exe;
+        int count;
+        public File(String exe, int count){
+            this.exe = exe;
+            this.count = count;
+
+        }
+        @Override
+        public int compareTo(File other){
+            return this.exe.compareTo(other.exe);
+        }
 
 
+    }
     static void input() {
         N= sc.nextInt();
         for (int i=0; i<N; i++){
-            set.add(sc.next());
-        }
-        List<String> list = new ArrayList<>();
-        for (String s: set){
-            list.add(s);
+            String input = sc.nextLine().split("\\.")[1];
+            hm.put(input, hm.getOrDefault(input, 0)+1);
         }
 
-        Collections.sort(list ,new Comparator<String>(){
-            @Override
-            public int compare(String me, String other){
-                if (me.length() != other.length()){
-                    return me.length() - other.length();
-                }else{
-                    return me.compareTo(other);
-                }
-            }
-        });
+        //file로 변환
+        List<File> files = new ArrayList<File>();
+        for (Map.Entry<String, Integer> entry : hm.entrySet()){
+            files.add(new File(entry.getKey(), entry.getValue()));
+        }
+        Collections.sort(files);
 
-        for (String s : list){
-            sb.append(s).append("\n");
+        for (File f : files){
+            sb.append(f.exe).append(" ").append(f.count).append("\n");
         }
         System.out.println(sb);
     }
