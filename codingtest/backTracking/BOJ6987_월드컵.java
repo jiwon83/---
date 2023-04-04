@@ -4,110 +4,97 @@ import java.util.*;
 public class Main {
     static StringBuilder sb = new StringBuilder();
     static FastReader sc = new FastReader();
-    static final int MAX_MATCH_COUNT = 15;
-    static int [][] graph;
-    static int [][] maches = new int[15][2]; //1부터 사용.
+    static int [][] result = new int[6][3];
+    static int [][] matches = new int[15][2]; //ABCDEF => 0,1,2,3,4,5
+    static boolean possible = false;
+/*
+5 0 0 3 0 2 2 0 3 0 0 5 4 0 1 1 0 4
+4 1 0 3 0 2 4 1 0 1 1 3 0 0 5 1 1 3
+5 0 0 4 0 1 2 2 1 2 0 3 1 0 4 0 0 5
+5 0 0 3 1 1 2 1 2 2 0 3 0 0 5 1 0 4
 
+1 0 0 3 0 2 2 0 3 0 0 5 4 0 1 1 0 4
+1 1 0 3 0 2 4 1 0 1 1 3 0 0 5 1 1 3
+5 2 0 4 0 1 2 2 1 2 0 3 1 0 4 0 0 5
+5 0 0 3 1 1 2 1 2 2 0 3 0 0 5 2 0 4
+ */
     static void makeMatches(){
-
-        for (int f = 0, idx =0; f <5; f++){
-            for (int s = f+1; s<6; s++){
-                maches[idx][0] = f;
-                maches[idx++][1] = s;
+        int idx =0;
+        for (int fir=0; fir<5; fir++){
+            for (int bac = fir+1; bac<6; bac++){
+                matches[idx][0] = fir;
+                matches[idx++][1] = bac;
             }
         }
 
     }
-    static boolean makeGraph(String result){
 
-        String [] input = result.split(" ");
-        graph = new int[6][3];
+    static void input() {
+        possible = false;
+        boolean matchCountFine=true;
+        result = new int[6][3]; //초기화
+
         for (int i=0; i<6; i++){
-            int sum=0;
-            for (int j =0; j<3; j++){
-                graph[i][j] = Integer.parseInt(input[i*3+j]);
-                sum+= graph[i][j];
+            int teamPerGame=0;
+            for (int j=0; j<3; j++){
+                result[i][j] = sc.nextInt();
+                teamPerGame+= result[i][j];
             }
-            if(sum != 5) {
-
-                return false;
-            }
+            if (teamPerGame != 5) matchCountFine=false;
         }
-        return true;
+        if (!matchCountFine){
+            sb.append(0).append(" ");
+            return;
+        }
+        recur(0,result);
+        sb.append(possible ? 1 : 0).append(" ");
 
     }
-    static boolean isPossible;
-    static boolean recur(int matchIdx, int [][] graph){
-        if (matchIdx == MAX_MATCH_COUNT){
-//            System.out.println("모든 매치에 성공!");
-            isPossible=true;
-            return true;
+    static void recur(int k, int [][] result){
+
+        if (k==15){
+            possible=true;
+
         }else{
-            int a = maches[matchIdx][0];
-            int b = maches[matchIdx][1];
-            //win - lose
-            if ( graph [a][0] > 0 && graph[b][2] > 0){
-                graph [a][0]--;
-                graph[b][2]--;
-                recur(matchIdx+1,graph);
-                graph [a][0]++;
-                graph[b][2]++;
+            //경기를 예측
+            int our = matches[k][0];
+            int other = matches[k][1];
+            //1. 승- 패
+            if (result[our][0] > 0 && result[other][2] > 0){
+                result[our][0]--;
+                result[other][2]--;
+                recur(k+1, result);
+                result[our][0]++;
+                result[other][2]++;
+            }
+
+            //2. 패 - 승
+            if (result[our][2] > 0 && result[other][0] > 0){
+                result[our][2]--;
+                result[other][0]--;
+                recur(k+1, result);
+                result[our][2]++;
+                result[other][0]++;
+            }
+            //3. 무-무
+            if (result[our][1] > 0 && result[other][1] > 0){
+                result[our][1]--;
+                result[other][1]--;
+                recur(k+1, result);
+                result[our][1]++;
+                result[other][1]++;
 
             }
-            //draw - draw
-            if ( graph [a][1] > 0 && graph[b][1] > 0){
-                graph [a][1]--;
-                graph[b][1]--;
-                recur(matchIdx+1,graph);
-                graph [a][1]++;
-                graph[b][1]++;
-            }
-            // lose - win
-            if ( graph [a][2] > 0 && graph[b][0] > 0){
-                graph [a][2]--;
-                graph[b][0]--;
-                recur(matchIdx+1,graph);
-                graph [a][2]++;
-                graph[b][0]++;
-            }
-            return false;
         }
-
     }
-    static void pro() {
-        /*
-        0. 한 줄 씩 처리한다. + 초기화 필요
-        0-1. graph를 받는다.
-        1. 대진표를 짠다. int [][] matches;
-        2. 대진표 1 index부터 승패를 예측하고 그래프를 수정한다. -> 해당 예측으로 recur()
-        3. 더이상 win-lose, draw - draw, lose - win 모두 불가하면 return;
-        4. 만약 matchCnt가 16라면 (모든 매치를 다 돈 것이므로 ) return true;
-        5. 1 또는 0으로 결과 저장
-         */
+
+    public static void main(String[] args) {
         makeMatches();
-        for(int T=0; T<4; T++){
-
-            isPossible=false;
-            String result = sc.nextLine();
-            if (makeGraph(result)){
-                recur(0, graph);
-                if(isPossible){
-                    sb.append("1").append("\n");
-                }else{
-                    sb.append("0").append("\n");
-                }
-            }else{ //만약 총 갯수가 30이 아니라면
-
-                sb.append("0").append("\n");
-            }
-
+        for (int i=0; i<4; i++){
+            input();
         }
         System.out.println(sb);
 
-
-    }
-    public static void main(String[] args) {
-        pro();
     }
     static class FastReader {
             BufferedReader br;
@@ -155,6 +142,3 @@ public class Main {
 
         }
 }
-
-
-
