@@ -1,45 +1,25 @@
 class Solution {
-    int count=0;
-    int seq=0;
-    String Word;
-    String [] alpha = {"A","E","I","O","U"};
-    boolean isFinish = false;
-    void recur(int k, String str){
-        
-        if(isFinish) return;
-        
-        System.out.println(str+ " >> "+count);// => 먼가 이상
-        if(k==5+1){
-            if(str.equals(Word)) {
-                
-                seq = count;
-                return;
-            }
-            count++;
-            
-        }else{
-            if(str.equals(Word)) {
-                
-                seq = count;
-                isFinish =true;
-                return;
-            }
-            else{
-                count++;
-                
-                for(int i=0; i<5; i++){
-                    
-                    recur(k+1, str+alpha[i]);
-                }
-                
-            }
-            
-            
+    int count =0;
+    String mou = "AEIOU";
+    int ans;
+    public void recur(int k, String str, String word){
+        if(k==6){
+            return;
         }
+        for(int i=0; i<mou.length(); i++){  
+            count++;
+            if((str + mou.charAt(i)).equals(word)){
+                ans =count;
+                return;
+            }
+            recur(k+1, str + mou.charAt(i), word);
+        }
+        
     }
     public int solution(String word) {
-        Word=word;
-        recur(1,"");
-        return seq;
+        int answer = 0;
+        recur(1, "", word);
+        return ans;
+
     }
 }
