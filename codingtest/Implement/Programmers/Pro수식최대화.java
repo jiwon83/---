@@ -1,173 +1,100 @@
-package implement;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-
-public class Pro수식최대화 {
-    static StringBuilder sb = new StringBuilder();
-    static FastReader sc = new FastReader();
-    static ArrayList<Long> nums = new ArrayList<>();
-    static ArrayList<String> opers = new ArrayList<>();
-    static int[] priorOper = new int[3];
-    static boolean[] vistPriorOper = new boolean[3];
-    static String[] stand = {"+", "-", "*"}; //0 1 2
-    static String expression;
-    static long max_result=0;
-
-    /* 필요한 함수들 */
-    void preprocess() {
-        //연산자와 숫자들 분리
-        String store = "";
-        for (int i = 0; i < expression.length(); i++) {
-            char n = expression.charAt(i);
-
-            if (n == '+' || n == '-' || n == '*') {
-                nums.add(Long.valueOf(store));
-                store = "";
-                opers.add(n + "");
-            } else {
-                store += n;
+import java.util.*;
+class Solution {
+    int [] select = new int[3];
+    boolean [] visit = new boolean[3];
+    List<Integer> opers = new ArrayList<>();
+    List<Long> nums = new ArrayList<>();
+    long ans= Long.MIN_VALUE;
+    
+    public void recur(int k){
+        if(k==3){
+            // System.out.println(Arrays.toString(select));
+            calculate(select);
+        }else{
+            for(int i=0; i<3; i++){
+                if(visit[i]) continue;
+                visit[i] = true;
+                select[k]=i;
+                recur(k+1);
+                visit[i] = false;
             }
         }
-        nums.add(Long.valueOf(store));
+        
     }
-
-    void recurMakePrior(int k) {
-
-        //우선 순위 조합 생성
-        if (k >= 3) {
-            long result = getResult();
-            max_result = Math.max(Math.abs(result), max_result);
+    public long calNums(long num1, long num2, int oper){
+        switch(oper){
+            case 0:
+                return num1 + num2;
+            case 1:
+                return num1 - num2;
+            case 2:
+                return num1* num2;
         }
-        for (int i = 0; i < 3; i++) {
-            if (!vistPriorOper[i]) {
-                priorOper[k] = i;
-                vistPriorOper[i] = true;
-                this.recurMakePrior(k + 1);
-                vistPriorOper[i] = false;
-            }
-
-        }
-
-        //조합에 따른 결과를 갱신해서
-        //최종 최대값 반환
-
+        return -1;
     }
-
-    long getResult() {
-//        System.out.print(Arrays.toString(priorOper)+ "/ ");
-        //현재 우선순위를 기준으로 계산 결과를 도출
+    public void calculate(int [] select){ //이에 따른 수식 계산 결괏값 갱신 => 중간 계산 값은 long
+        long result = 0;
         ArrayList<Long> numsCp = new ArrayList<>();
-        ArrayList<String> opersCp = new ArrayList<>();
+        ArrayList<Integer> opersCp = new ArrayList<>();
         numsCp.addAll(nums);
         opersCp.addAll(opers);
-
-        for (int i = 0; i < priorOper.length; i++) { //우선 순위 순으로 0 1 2
-            for (int j = 0; j < opersCp.size(); j++) { //연산자들을 순회하며 + * -
-                if (stand[priorOper[i]].equals(opersCp.get(j))) {
-                    long val = calculate(numsCp.get(j), numsCp.get(j + 1), priorOper[i]);
-//                    System.out.println("cal "+ numsCp.get(j) + " "+ stand[i]+ " "+  numsCp.get(j + 1)+" = "+val);
-                    //nums에 계산 결과 갱신
-                    numsCp.remove(j + 1);
-                    numsCp.remove(j);
+        //절댓값으로 갱신
+        for(int i=0; i<3; i++){
+            int seq = select[i];
+            for(int j=0; j<opersCp.size(); j++){
+            
+                if(seq == opersCp.get(j)){
+                    //바로 계산
+        
+                    long val = calNums(numsCp.get(j), numsCp.get(j+1), opersCp.get(j));
+                    
+                    numsCp.add(j,val);
+                    numsCp.remove(j+1); numsCp.remove(j+1); 
                     opersCp.remove(j);
-                    numsCp.add(j, val);
-                    //index 앞으로 땡기기
                     j--;
-
+                    
                 }
+                
             }
         }
-//        System.out.println("결과: "+ numsCp.get(0));
-        return numsCp.get(0);
+
+        result = Math.abs(numsCp.get(0));
+        ans = Math.max(ans, result);
     }
-
-    long calculate(long a, long b, int operator) {
-        long result = 0;
-        switch (operator) {
-            case 0:
-                result = a + b;
-                break;
-            case 1:
-                result = a - b;
-                break;
-
-            case 2:
-                result = a * b;
-                break;
-        }
-        return result;
-    }
-
-
     public long solution(String expression) {
-        this.expression = expression;
-        preprocess();
-        recurMakePrior(0);
-        return max_result;
+        long answer = 0;
+        //1. 연산자와 숫자 분리해서 저장
+        StringBuilder sb =new StringBuilder();
+        for(int i=0; i<expression.length(); i++){
+            char c = expression.charAt(i);
+            if(!Character.isDigit(c)){//숫자가 아니면 이전 값 nums에 저장, oper 저장 , 비우기
+                nums.add(Long.parseLong(sb.toString()));
+                sb.setLength(0);
+                opers.add(changeToInt(c));
+            
+            }else{//숫자이면 keep
+                sb.append(c);
+            } 
+        }
+        nums.add(Long.parseLong(sb.toString()));
+
+        
+        //2. 우선순위 정하기 // 우선순위는 + - * 0 1 2의미
+        recur(0);
+        //3. 이에 따른 수식 계산 결괏값 갱신 => 중간 계산 값은 long
+        
+        
+        return ans;
     }
-
-
-    public static void main(String[] args) {
-        Pro수식최대화 s = new Pro수식최대화();
-        System.out.println(s.solution("100-200*300-500+20"));
-        sc.close();
-
-    }
-
-    static class FastReader {
-        BufferedReader br;
-        StringTokenizer st;
-
-        public FastReader() {
-            br = new BufferedReader(new InputStreamReader(System.in));
-
+    public int changeToInt(char oper){
+        switch(oper){
+            case '+':
+                return 0;
+            case '-':
+                return 1;
+            case '*':
+                return 2;
         }
-
-        String next() {
-            while (st == null || !st.hasMoreTokens()) {  //현재 남아 있는 토큰이 없다면 새로 받아온다.
-                try {
-                    st = new StringTokenizer(br.readLine());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return st.nextToken();
-        }
-
-        int nextInt() {
-            return Integer.parseInt(next());
-        }
-
-        long nextLong() {
-            return Long.parseLong(next());
-        }
-
-        double nextDouble() {
-            return Double.parseDouble(next());
-        }
-
-        String nextLine() {
-            String str = "";
-            try {
-                str = br.readLine();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return str;
-        }
-
-        void close() {
-            try {
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+        return -1;
     }
 }

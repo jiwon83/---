@@ -1,52 +1,55 @@
+https://school.programmers.co.kr/learn/courses/30/lessons/92334
+
 import java.util.*;
 class Solution {
+    Map<String, Integer> attacked = new HashMap<>();
+    Map<String, HashSet<String>> attack = new  HashMap<>();
+    Set<String> stopList = new HashSet<>();
+    Map<String, Integer> idIndex = new HashMap<>();
+    
+    
     public int[] solution(String[] id_list, String[] report, int k) {
-        int[] answer = new int[id_list.length];
-
-        HashMap<String, Integer> user_idx_info = new HashMap<>();
-        HashMap<String, Integer> reported = new LinkedHashMap<>();
-        HashMap<String, HashSet<String>> reports = new HashMap<>();
-        ArrayList<String> stop = new ArrayList<String>();
-        
-        //초기화
+        int[] answer = {};
         for(int i=0; i<id_list.length; i++){
-            reports.put(id_list[i], new HashSet<>());
-            user_idx_info.put(id_list[i], i);
+            attack.put(id_list[i], new HashSet<>());
+            idIndex.put(id_list[i], i);
         }
+        int [] result = new int[id_list.length];
         
-        //유저별 신고한 목록
-        for(String re : report){
-            String [] temp = re.split(" "); //신고자 신고대상
-            String me = temp[0]; String other = temp[1];
-            reports.get(me).add(other); 
+        Set<String> temp = new  HashSet<>();
+        for(int i=0; i<report.length; i++){
+            temp.add(report[i]);
         }
+        report = temp.toArray(new String[temp.size()]);
         
-        // for(Map.Entry<String, HashSet<String>> entry : reports.entrySet()){
-        //     System.out.println(entry.getKey() + " : "+ Collections.unmodifiableSet(entry.getValue()));
-        // }
-
-        //신고 당한 횟수 계산
-        for(Map.Entry<String, HashSet<String>> entry : reports.entrySet()){
-            for(String reported_user : entry.getValue()){
-                reported.put(reported_user , reported.getOrDefault(reported_user, 0) + 1);
+        //1. report로 생신 "muzi frodo"
+        for(int i=0; i<report.length; i++){
+            String rep [] = report[i].split(" ");
+            attacked.put(rep[1], attacked.getOrDefault(rep[1],0)+1);
+            attack.get(rep[0]).add(rep[1]);
+        }
+        //2. 정지자 목록 갱신
+        for( Map.Entry<String, Integer> entry : attacked.entrySet() ){
+            
+            // System.out.println("공격 당한 "+entry.getKey()+" 이 "+ entry.getValue()+"번");
+            if(entry.getValue() >= k) {
+                stopList.add(entry.getKey());
             }
         }
-        
-        for(Map.Entry<String, Integer > entry : reported.entrySet()){
-            if(entry.getValue() >= k){
-                //정지 대상
-                stop.add(entry.getKey());
+        int resIdx=0;
+        //3. 메일 횟수 갱신
+        for(Map.Entry<String, HashSet<String>> entry : attack.entrySet() ){
+            String id = entry.getKey();
+            int cnt =0;
+            for(String person : entry.getValue()){
+                if(stopList.contains(person)){
+                    cnt++;
+                }
             }
-            // System.out.println(entry.getKey() + " : "+ entry.getValue());
+            
+            result[idIndex.get(id)] = cnt;
         }
         
-        //리포츠에서 자신이 신고한 사람들이 신고당한 수만큼 answer에 갱신
-        for(Map.Entry<String, HashSet<String>> entry : reports.entrySet()){
-            for(String s : entry.getValue()){
-                if(stop.contains(s)) answer[user_idx_info.get(entry.getKey())]++;
-            }
-        }
-
-        return answer;
+        return result;
     }
 }
