@@ -1,48 +1,49 @@
 import java.util.*;
 class Solution {
     public String[] solution(String[] files) {
-        String[] answer = {};
-        //정렬 커스터 마이징
+        
         Arrays.sort(files, new Comparator<String>(){
            @Override
-            public int compare(String o1, String o2){
-                String [] me = distribute(o1);
-                String [] other = distribute(o2);
-                int first = me[0].toString().compareTo(other[0].toString());
-                
-                if(first==0){ //숫자 순
-                
-                    int meNum = Integer.parseInt(me[1]);
-                    int otherNum = Integer.parseInt(other[1]);
-                    
-                    if(meNum != otherNum) return meNum - otherNum;
-                    else return 0;//입력순
-                }
-                return first;//head의 사전 순
-                
-            }
-            // 문자열을 나누는 함수
-            private String[] distribute(String s){
-                
-                s = s.toUpperCase();
-                String [] result = {"","",""};
-                int i=-1;
-                //head
-                while(i+1 < s.length() && !Character.isDigit(s.charAt(i+1))){
-                    result[0] += s.charAt(++i);
-                }
-                //number
-                while(i+1 < s.length() && result[1].length() < 5 && Character.isDigit(s.charAt(i+1))){
-                    result[1] += s.charAt(++i);
-                }
-                //tail
-                result[2] = s.substring(i+1);     
+            public int compare(String s1, String s2){
+      
+                String head1 = makeHead(s1);
+                String head2 = makeHead(s2);
+                int number=makeNumber(head1.length(), s1);
+                int number2=makeNumber(head2.length(), s2);
+   
+                int CompareHead = head1.compareTo(head2.toString());
 
-                // System.out.println(Arrays.toString(result));
-                return result;
+                if( CompareHead == 0 ){
+                    if(number != number2){
+                        return number - number2;
+                    }else{
+                        return 0;
+                    }
+                }
+                return CompareHead;
             }
+            
+            public String makeHead(String str){
+                str = str.toUpperCase();
+                StringBuilder head = new StringBuilder();
+                int idx = -1;
+                while(! ('0' <= str.charAt(idx+1) && str.charAt(idx+1) <= '9') ){ //다음이 숫자가 아닌 동안.
+                    head.append(str.charAt(++idx));
+                }
+                return head.toString();
+            }
+            
+            public int makeNumber(int startIdx, String str){ //int구하기 : 한 글자에서 최대 다섯 글자 사이의 연속된 숫자
+                int idx = startIdx;
+                StringBuilder num = new StringBuilder();
+                
+                while( idx < str.length() && num.length()<5 && '0' <= str.charAt(idx) && str.charAt(idx) <= '9' ){
+                    num.append(str.charAt(idx++));
+                }
+                return Integer.parseInt(num.toString());
+            }
+            
         });
-
         return files;
     }
 }
