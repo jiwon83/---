@@ -1,107 +1,40 @@
-package bfsdfs;
-import java.io.*;
 import java.util.*;
-/*
-골드 3 내리막길: https://www.acmicpc.net/problem/1520
-시도: 시간초과,
- */
-public class BOJ1520_내리막길 {
-    static int M,N, cnt;
+import java.io.*;
+class Main{
+    static int [][] dp, map;
+    static int N,M;
     static boolean [][] visit;
-    static int [][] graph;
-    static int [] dx ={-1,1,0,0}, dy={0,0,-1,1};
-
-    static StringBuilder sb = new StringBuilder();
-    static FastReader sc = new FastReader();
-
-    static void input() {
-        //M, N을 입력 받고 그래프 초기화
-        M = sc.nextInt();
-        N= sc.nextInt();
-        visit= new boolean[M+1][N+1];
-        graph= new int[M+1][N+1];
-
-        for (int i=1; i<=M; i++){
-            for (int j=1; j<=N; j++){
-                graph[i][j] = sc.nextInt();
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String [] args) throws Exception{
+        input();
+        System.out.println(dfs(0,0));
+    }
+    static void input() throws Exception{
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        dp= new int[N][M];
+        map= new int[N][M];
+        visit = new boolean[N][M];
+        for(int i=0; i<N; i++){
+            String [] temp = br.readLine().split(" ");
+            for(int j=0; j<M; j++){
+                map[i][j] =Integer.parseInt(temp[j]);
+                dp[i][j]= -1; //-1로 방문 확인, 이 처리를 안한다면 목적지에 도착하지 않았던 경로를 반복할 수 있다. -> 시간 초과
             }
         }
-
     }
-    static void pro() {
-        dfs(1,1);
-        System.out.println(cnt);
-
-    }
-
-    private static void dfs(int x, int y) {
-        visit[x][y]= true;
-        if (x == M && y== N){ //목적지에 도착하면
-            cnt++;
-            return;
-        }
-        for (int i=0; i<4; i++){
+    static int [] dx = {0,0,-1,1}, dy={-1,1,0,0};
+    static int dfs(int x, int y){
+        if(x==N-1 && y==M-1) return 1;
+        if(dp[x][y] != -1) return dp[x][y];
+        dp[x][y] = 0;
+        for(int i=0; i<4; i++){
             int nx = x + dx[i];
             int ny = y + dy[i];
-
-            if (0 < nx && 0 < ny && M >= nx && N >=ny && isLower(graph[x][y] , graph[nx][ny])){
-                dfs(nx,ny);
-                visit[nx][ny] = false;
-            }
+            if(nx < 0 || ny < 0 || nx>=N || ny >=M || map[nx][ny] >= map[x][y]) continue;
+            dp[x][y]+= dfs(nx,  ny);
         }
-    }
-
-    private static boolean isLower(int from, int to ) {
-        return from > to;
-    }
-
-    public static void main(String[] args) {
-        input();
-        pro();
-    }
-    static class FastReader {
-        BufferedReader br;
-        StringTokenizer st;
-
-        public FastReader() {
-            br = new BufferedReader(new InputStreamReader(System.in));
-
-        }
-        String next(){
-            while (st == null || !st.hasMoreTokens()){  //현재 남아 있는 토큰이 없다면 새로 받아온다.
-                try {
-                    st = new StringTokenizer(br.readLine());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return st.nextToken();
-        }
-
-        int nextInt(){
-            return Integer.parseInt(next());
-        }
-        long nextLong(){return Long.parseLong(next()); }
-
-        double nextDouble(){return Double.parseDouble(next());}
-
-        String nextLine(){
-            String str ="";
-            try {
-                str = br.readLine();
-
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            return str;
-        }
-        void close() {
-            try {
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+        return dp[x][y];
     }
 }
