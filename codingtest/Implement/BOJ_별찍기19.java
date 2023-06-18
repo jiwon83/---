@@ -22,9 +22,8 @@ class Main2
     static FastReader fr = new FastReader();
     public static void main(String[] args) throws IOException{
         input();
-
-        //recur(N/2, N/2, '*');
-        bfs();
+        //bfs();
+        printStar();
         StringBuilder sb = new StringBuilder();
         for (int i=0; i < N; i++){
             sb.append(new String(map[i])+"\n");
@@ -40,7 +39,22 @@ class Main2
 
     }
     static int [][] dir = {{-1,0}, {-1, 1}, {0, 1}, {1,1}, {1,0}, {1,-1}, {0,-1},{-1,-1}};
+    static boolean isStar(int x, int y){
+        int cX = N/2, cY= N/2;
+        return Math.max(Math.abs(cX - x), Math.abs(cY - y)) % 2 == 0;
+    }
+    static void printStar(){
+        for (int i=0; i<N; i++){
+            for (int j=0; j<N; j++){
+                if (isStar(i, j)){
+                    map[i][j] = '*';
+                }else{
+                    map[i][j] =' ';
+                }
 
+            }
+        }
+    }
     static void bfs(){
         Queue<Point> q = new LinkedList<>();
         q.add(new Point(N/2, N/2, '*'));
