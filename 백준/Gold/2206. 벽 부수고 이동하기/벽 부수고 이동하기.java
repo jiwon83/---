@@ -1,14 +1,27 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
-import java.io.*;
-import java.util.*;
+/*
+7 4
+0000
+1110
+1100
+1101
+0000
+0111
+0000
+ */
 
 public class Main {
     static class P{
         int x, y, time;
-        int isBreak;
-        public P(int x, int y, int time, int isBreak) {
+        boolean isBreak;
+
+        public P(int x, int y, int time, boolean isBreak) {
             this.x = x;
             this.y = y;
             this.time = time;
@@ -26,106 +39,87 @@ public class Main {
         }
     }
 
+
     static int [] dx = {-1,0,1,0}, dy = {0,1,0,-1};
     static int N, M;
-    static boolean [][][] visit; //[0]은 뿌신
     static int [][] map;
-    static int [][][] time;
+    static int [][] time; //최소시간
+    static boolean [][] visit; //방문여부
+    static int ans;
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
 
-        //input
-        /*
-        6 4
-0100
-1110
-1000
-0000
-0111
-0000
-         */
         st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         map = new int[N+1][M+1];
-        time = new int[2][N+1][M+1];
-        for (int i= 1; i<=N; i++){
-            Arrays.fill(time[0][i], Integer.MAX_VALUE);
-            Arrays.fill(time[1][i], Integer.MAX_VALUE);
-        }
-        visit = new boolean[2][N+1][M+1]; // 0 = 벽을 안뿌신것 , 1 = 벽을 뿌신 것 => 안 뿌셔지는 벽이 아닌 곳에 대해 둘다 방문할 수 있도록
+        time = new int[N+1][M+1]; //시작지점부터 i, j지점까지의 최단 거리
+        visit = new boolean[N+1][M+1];
         for (int i=1; i<=N; i++){
             String temp = br.readLine();
-//            st = new StringTokenizer(br.readLine());
             for (int j = 1; j <= M ; j++ ){
-                map[i][j] = temp.charAt(j-1)-'0';//Integer.parseInt(st.nextToken());
+                map[i][j] = temp.charAt(j-1)-'0';
             }
         }
 
-//        System.out.println(Arrays.deepToString(map));
-
+        for(int i=1; i <= N; i++){
+            Arrays.fill(time[i], Integer.MAX_VALUE);
+        }
+        ans = -1;
         bfs(1,1);
+        System.out.println(ans);
 
+
+//        System.out.println("----------");
+//        for(int i=1; i <= N; i++) System.out.println(Arrays.toString(time[i]));
+//        for(int i=1; i <= N; i++) System.out.println(Arrays.toString(visit[i]));
 
     }
     static void bfs(int sx, int sy)
     {
-        int minTime = -1;
         ArrayDeque<P> q = new ArrayDeque<>();
-        q.addLast(new P(sx, sy, 1, 0));
-        visit[0][sx][sy] = true;
+        q.addLast(new P(sx, sy, 1, false));
+        visit[sx][sy] = true;
+        time[sx][sy] = 1;
 
-        while(!q.isEmpty()) {
-            P now = q.pollFirst();
-//            System.out.println(now);
-            int x = now.x;
-            int y = now.y;
-            time[now.isBreak][x][y] = now.time;
-
-            if(x == N && y == M){ //종료 조건
-                minTime = now.time;
+        while(!q.isEmpty()){
+            P out = q.pollFirst();
+            if(out.x == N&& out.y == M){
+                ans = time[out.x][out.y];
                 break;
             }
-            // 4방 탐색
-            for (int i=0; i<4; i++){
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-                if(!inArea(nx, ny)) continue;
-                if(map[nx][ny] == 1){ //벽이라면
-                    if(now.isBreak==0 && !visit[1][nx][ny]){
-                        visit[1][nx][ny] = true;
-//                        System.out.println( nx + " , "+ ny + " 벽을 부시고 간다");
-                        time[1][nx][ny] = now.time+1;
-                        q.addLast(new P(nx, ny, now.time+1, 1));
+            for(int d = 0; d < 4; d++){
+                int nx = out.x + dx[d];
+                int ny = out.y + dy[d];
+                if( !inArea(nx, ny) ) continue;
+                if(!out.isBreak && map[nx][ny] == 1 && !visit[nx][ny]){
+                    //벽을 깨고 이동
+                    visit[nx][ny] = true;
+                    time[nx][ny] =  out.time + 1;
+                    q.addLast(new P(nx, ny, out.time+1, true));
+
+                }else if(map[nx][ny] == 0){
+//                    if(nx == 7 && ny == 3){
+//                        System.out.println("들어옴 "+ out+ " / "+time[nx][ny]);
+//                    }
+
+                    if(out.isBreak && (out.time + 1 < time[nx][ny])){ //더 유리할 때만 이동
+                        time[nx][ny] =  out.time + 1;
+                        q.addLast(new P(nx, ny, out.time+1, true));
+
+                    }else if(!out.isBreak && !visit[nx][ny]){ //방문한 적 없다면 이동
+
+                        visit[nx][ny] = true;
+                        time[nx][ny] =  out.time + 1; //time 배열도 갱신해준다.
+                        q.addLast(new P(nx, ny, out.time+1, false));
                     }
                 }
-                if(map[nx][ny] == 0){
-//                    System.out.println(" not wall "+ nx + " , "+ ny);
-                    if(now.isBreak==1 && ( !visit[1][nx][ny] || time[1][nx][ny] > now.time + 1) ){
-                        visit[1][nx][ny] = true;
-                        time[1][nx][ny] = now.time+1;
-                        q.addLast(new P(nx, ny, now.time+1, now.isBreak));
-                    }
-//                    System.out.println("condition 2 : "+ (now.isBreak == 0) + (!visit[0][nx][ny]));
-                    if(now.isBreak == 0 && !visit[0][nx][ny]){
-                        visit[0][nx][ny] = true;
-
-                        q.addLast(new P(nx, ny, now.time+1, now.isBreak));
-                    }
-
-                }
-
-
             }
         }
-//        System.out.println("not break");
-//        for (int i= 1; i<= N ; i++ ) System.out.println(Arrays.toString(time[0][i]));
-//        System.out.println(" break");
-//        for (int i= 1; i<= N ; i++ ) System.out.println(Arrays.toString(time[1][i]));
-        System.out.println(minTime);
+
     }
     static boolean inArea(int x, int y){
         return x > 0 && y > 0 && x <= N && y <= M;
