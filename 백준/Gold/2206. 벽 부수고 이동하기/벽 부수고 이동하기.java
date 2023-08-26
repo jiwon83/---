@@ -19,32 +19,20 @@ import java.util.StringTokenizer;
 public class Main {
     static class P{
         int x, y, time;
-        boolean isBreak;
+        int isBreak;
 
-        public P(int x, int y, int time, boolean isBreak) {
+        public P(int x, int y, int time, int isBreak) {
             this.x = x;
             this.y = y;
             this.time = time;
             this.isBreak = isBreak;
         }
-
-        @Override
-        public String toString() {
-            return "P{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", time=" + time +
-                    ", isBreak=" + isBreak +
-                    '}';
-        }
     }
-
 
     static int [] dx = {-1,0,1,0}, dy = {0,1,0,-1};
     static int N, M;
     static int [][] map;
-    static int [][] time; //최소시간
-    static boolean [][] visit; //방문여부
+    static int [][] visit; //방문여부
     static int ans;
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -56,8 +44,9 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         map = new int[N+1][M+1];
-        time = new int[N+1][M+1]; //시작지점부터 i, j지점까지의 최단 거리
-        visit = new boolean[N+1][M+1];
+//        visit = new boolean[2][N+1][M+1];
+        visit = new int[N+1][M+1];
+
         for (int i=1; i<=N; i++){
             String temp = br.readLine();
             for (int j = 1; j <= M ; j++ ){
@@ -65,13 +54,12 @@ public class Main {
             }
         }
 
-        for(int i=1; i <= N; i++){
-            Arrays.fill(time[i], Integer.MAX_VALUE);
+        for(int i=1; i<= N; i++){
+            Arrays.fill(visit[i], Integer.MAX_VALUE);
         }
         ans = -1;
         bfs(1,1);
         System.out.println(ans);
-
 
 //        System.out.println("----------");
 //        for(int i=1; i <= N; i++) System.out.println(Arrays.toString(time[i]));
@@ -81,44 +69,39 @@ public class Main {
     static void bfs(int sx, int sy)
     {
         ArrayDeque<P> q = new ArrayDeque<>();
-        q.addLast(new P(sx, sy, 1, false));
-        visit[sx][sy] = true;
-        time[sx][sy] = 1;
+        q.addLast(new P(sx, sy, 1, 0));
+        visit[sx][sy] = 0;
 
         while(!q.isEmpty()){
             P out = q.pollFirst();
-            if(out.x == N&& out.y == M){
-                ans = time[out.x][out.y];
+            if(out.x == N && out.y == M){
+                ans = out.time;
                 break;
             }
             for(int d = 0; d < 4; d++){
                 int nx = out.x + dx[d];
                 int ny = out.y + dy[d];
-                if( !inArea(nx, ny) ) continue;
-                if(!out.isBreak && map[nx][ny] == 1 && !visit[nx][ny]){
-                    //벽을 깨고 이동
-                    visit[nx][ny] = true;
-                    time[nx][ny] =  out.time + 1;
-                    q.addLast(new P(nx, ny, out.time+1, true));
+                if( !inArea(nx, ny) || out.isBreak >= visit[nx][ny]) continue;
 
-                }else if(map[nx][ny] == 0){
-//                    if(nx == 7 && ny == 3){
-//                        System.out.println("들어옴 "+ out+ " / "+time[nx][ny]);
-//                    }
-
-                    if(out.isBreak && (out.time + 1 < time[nx][ny])){ //더 유리할 때만 이동
-                        time[nx][ny] =  out.time + 1;
-                        q.addLast(new P(nx, ny, out.time+1, true));
-
-                    }else if(!out.isBreak && !visit[nx][ny]){ //방문한 적 없다면 이동
-
-                        visit[nx][ny] = true;
-                        time[nx][ny] =  out.time + 1; //time 배열도 갱신해준다.
-                        q.addLast(new P(nx, ny, out.time+1, false));
+                if(map[nx][ny] == 1){
+                    if(out.isBreak == 0){
+                        visit[nx][ny] = 1;
+                        q.addLast(new P(nx, ny, out.time+1, 1));
                     }
+
+                }else{ //땅이라면
+                    if(out.isBreak == 0){ //현재는 벽을 안 깬 상태에서, 벽을 깼던 점이 지나간 곳(visit == 1) 재방문 가능
+                        visit[nx][ny] = out.isBreak;
+                        q.addLast(new P(nx, ny, out.time+1, 0));
+                    }else{ //벽을 깼다면
+                        //방문하지 않았던 곳만 가능
+                        visit[nx][ny] = out.isBreak;
+                        q.addLast(new P(nx, ny, out.time+1, 1));
+                    }
+
                 }
-            }
-        }
+            }//for
+        }//while
 
     }
     static boolean inArea(int x, int y){
