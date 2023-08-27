@@ -1,11 +1,16 @@
-
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * 미생물 분리
+ * point, 미생물이 3개이상 겹칠 경우 우선순위를 두어 미생물이 큰 방향으로 변경하도록 하였는데
+ * 이를 구현하기위해 1. 우선순위 반영 정렬, 2. 군집 내부에서 캥거루처럼 먹도록 표현
+ * */
 class Solution
 {
-    static class Group{
-        int x, y, micro, d;
+    static class Group implements Comparable<Group>{
+        int x, y, micro, d, num;
         List<Group> duplicate;
         public Group(int x, int y , int micro, int d){
             this.x  =x ;
@@ -15,21 +20,32 @@ class Solution
             duplicate = new ArrayList<>();
         }
 
-        public boolean isDup(){ // 다른 그룹을 먹었는 지 확인
-            return duplicate.size() > 0;
+        @Override
+        public int compareTo(Group o) {
+            //일단 같은 좌표로 정렬 , 같은 좌표 중에 micro가 큰 순으로
+            if (this.num == o.num){
+                return o.micro - this.micro;
+            }
+            return this.num - o.num;
+            /*
+            if(this.x != o.x){
+               return Integer.compare(this.x, o.x);
+            }else if(this.y != o.y){
+               return Integer.compare(this.y, o.y);
+            }else if(this.micro != o.micro){
+                return - (this.micro - o.micro); //micro 오름차순
+            }
+            return 0;
+            */
         }
-        public void addDup(Group g){ //이 그룹에 먹힌다.
-            duplicate.add(g);
-        }
-        public void solveDup(){
-            //현재까지의 그룹들 중 큰 것으로 방향 변경 및 미생물 수 합산
-            duplicate.add(new Group(this.x, this.y, this.micro, this.d)); //자기 자신도 copy 넣는다.
-            Collections.sort(duplicate, (o1, o2) -> o2.micro - o1.micro);
-            Group win = duplicate.get(0);
-            this.d = win.d; //방향 변경
-            this.micro = 0; //미생물 수 합산
-            for (Group g : duplicate) this.micro += g.micro;
-            duplicate.clear();
+
+        @Override
+        public String toString() {
+            return "Group{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    ", micro=" + micro +
+                    ", d=" + d ;
         }
     }
     static int N, M, K;
@@ -43,8 +59,8 @@ class Solution
         {
             st = new StringTokenizer(br.readLine());
             ArrayList<Group> groupList = new ArrayList<>();
-            N  = toInt(st.nextToken()) ;
-            M =toInt(st.nextToken()) ;
+            N = toInt(st.nextToken()) ;
+            M = toInt(st.nextToken()) ;
             K = toInt(st.nextToken());
             for(int i=1; i<=K; i++){
                 st = new StringTokenizer(br.readLine());
@@ -55,17 +71,13 @@ class Solution
                 groupList.add(new Group(x, y, micro, d));
             }
 
-            int [][] curGroup;
-
             for(int t = 1; t <= M; t++){
-                curGroup = new int[N][N]; //중복 여부를 위해 먼저온 그룹의 index를 저장할 배열
-                for(int i =0; i<N; i++) Arrays.fill(curGroup[i], -1);
-
                 //군집을 각각 이동시킨다.
                 for(int i = 0; i< groupList.size(); i++){
                     Group g = groupList.get(i); //참조 포인터 g
                     g.x += dx[g.d];
                     g.y += dy[g.d];
+                    g.num = g.x * N + g.y;
                     if(isRed(g.x, g.y, N)){ //만약 약품에 도착하면
                         g.micro = reduceMicro(g.micro); //미생물 수 감소
                         g.d = reverseDir(g.d);
@@ -73,24 +85,21 @@ class Solution
                     if(g.micro == 0){
                         groupList.remove(i);
                         i--;
-                        continue;
-                    }
-                    int alreadyIndex = curGroup[g.x][g.y];
-                    if( alreadyIndex != -1){ //만약 다른 그룹이 이미 도착했다면
-                        groupList.get(alreadyIndex).addDup(g);
-                        groupList.remove(i); //삭제
-                        i--;
-                    }else{
-                        curGroup[g.x][g.y] = i; //현재 위치 기록
                     }
                 }
-                for (Group group : groupList){
-                    if (group.isDup()){
-                        group.solveDup();
+                Collections.sort(groupList);
+
+                //합치는 작업
+                for(int i=0; i<groupList.size()-1; i++){
+                    if(groupList.get(i).num == groupList.get(i+1).num){
+                        //어짜피 앞이 가장 미생물이 많을 것.
+                        groupList.get(i).micro += groupList.get(i+1).micro;
+                        groupList.remove(i+1);
+                        i--; //1~3이 같을 지도 모르기 때문에 다시 인덱스를 당겨준다.
                     }
+
                 }
             }//for m
-
             int sum = 0;
             for(Group g : groupList) sum += g.micro;
             System.out.printf("#%d %d\n", test_case, sum);
@@ -112,5 +121,4 @@ class Solution
     static boolean isRed(int x, int y, int N){
         return x == 0 || y == 0 || x == N-1 || y==N-1;
     }
-
 }
