@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class Main{
+public class Main {
     static class Machine{
         int x,y,dir;
         public Machine(int x, int y, int dir){
@@ -44,20 +44,6 @@ public class Main{
     static int[][] dirs = {{-1,0}, {0,1}, {1,0}, {0,-1}};
     static StringTokenizer st;
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            /*
-        7 8 1
-0 0 0 0 0 0 0 0
-0 0 0 0 4 0 0 0
-0 0 0 0 0 0 0 0
-0 0 5 5 0 0 0 0
-0 0 0 0 0 5 0 0
-0 0 0 0 0 0 0 0
-0 0 0 0 3 0 0 0
-3
-4 4 1
-5 4 0
-5 6 0
-         */
 
     static void input() throws IOException{
         st = new StringTokenizer(br.readLine());
@@ -117,17 +103,6 @@ public class Main{
         }
 
     }
-    static void flattentest(){
-        String [] test = "5 18 70 23 46 0 0 2 20".split(" "); // 0 1 2 3 4 5 6 7 8 9
-        for (int i = 1; i<= R; i++){ //1 2 3
-            for (int j = 1; j<=C; j++) { // 1 2 3
-                temp[i][j].temp = Integer.parseInt(test[(i-1)*3 + (j-1)]);
-            }
-        }
-        printSpaceMapTemp(temp);
-
-        flatten(temp);
-    }
 
     public static void main(String[] args) throws IOException{
         input();
@@ -146,9 +121,6 @@ public class Main{
             downSideTemp(temp);
 
             ate++;
-
-//            System.out.println(" ate :"+ate+"---------------");
-//            printSpaceMapTemp(temp);
 
             //4. 모든 칸 검사
             int checked = 0;
@@ -188,20 +160,14 @@ public class Main{
                             quan[i][j] += gap / 4;
                         }
                     }
-
                 }
             }
         }
-//        System.out.println(" 온도 증가율 계산 완료 ");
         for (int i = 1; i<= R; i++) {
             for (int j = 1; j <= C; j++) {
                 temp[i][j].temp += quan[i][j];
-//                System.out.printf(quan[i][j]+" ");
             }
-//            System.out.println();
         }
-//        System.out.println(" 온도 조절 완료 후 temp ");
-//        printSpaceMapTemp(temp);
     }
 
     private static void updateTempByMachine(Machine m,  Space[][] temp) {
@@ -216,7 +182,7 @@ public class Main{
         while (!q.isEmpty()){
             Wind now = q.pollFirst();
 
-            if (now.pass == 0 ) nowTemp[now.x][now.y] = Math.max(nowTemp[now.x][now.y], now.temp); //이동중이 아니라면 온도 상승에 갱신
+            if (now.pass == 0 ) nowTemp[now.x][now.y] = now.temp; //이동중이 아니라면 온도 상승에 갱신
 
             if (now.pass == 1){ // 이동 중인 위치였다면, 머신 방향 탐색
                 int nx = now.x + dirs[m.dir][0];
@@ -247,7 +213,7 @@ public class Main{
                     if( !inArea(nx, ny) || now.temp == 1) continue;
                     int wallDir = (dir + 2) % 4;
                     if (temp[nx][ny].wall[wallDir]) continue;
-                    if (i == 2 ){
+                    if (i == 2){
 //                    if (i == 2  && !ch[nx][ny] ){
                         ch[nx][ny] = true;
                         q.addLast(new Wind(nx, ny, now.temp-1, 0)); //머신 방향 탐색
@@ -257,9 +223,6 @@ public class Main{
                 }
             }
         }
-
-//        printMap(nowTemp);
-
         //temp에 더한다.
         for (int i = 1; i <=R ; i++){
             for(int j = 1; j<=C; j++){
