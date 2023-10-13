@@ -18,14 +18,13 @@ public class Main {
     }
     static void recur(int k, int [] arr) throws IOException {
         if (k == N+1){
-//            StringBuilder sb =new StringBuilder();
+            StringBuilder sb =new StringBuilder();
             for (int i =1; i<=N; i++){
-//                sb.append(arr[i]);
-                bw.write(arr[i]+"");
+                sb.append(arr[i]);
+    
             }
-            bw.flush();
-            bw.close();
-//            System.out.println(sb);
+
+            System.out.println(sb);
             System.exit(0);
         }
         for (int i =1; i<=3; i++){
