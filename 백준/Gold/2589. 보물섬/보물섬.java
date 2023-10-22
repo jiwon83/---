@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Array;
@@ -27,9 +28,9 @@ public class Main {
         for (int i = 0; i < R; i++) {
             for (int j = 0; j <C; j++){
                 if(map[i].charAt(j) == 'L'){
-                    // 이점에서 bfs 시작
                     ArrayDeque<Point> q = new ArrayDeque<>();
                     int [][] time = new int[R][C];
+                    time[i][j] = -1;
                     q.addLast(new Point(i, j));
                     int level = 0;
                     while (!q.isEmpty()){
@@ -42,15 +43,12 @@ public class Main {
                                 int ny = now.y + dy[d];
                                 if( nx  < 0 || ny < 0 || nx >= R || ny >=C) continue;
                                 if( map[nx].charAt(ny)== 'W') continue;
-                                if( nx == i && ny == j) continue;
                                 if( time[nx][ny] != 0) continue;
                                 q.addLast(new Point(nx, ny));
                                 time[nx][ny] = level;
                             }
                         }
-
                     }
-       
                     ans = Math.max(ans, level);
                 }
             }
