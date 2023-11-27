@@ -9,20 +9,26 @@ class Main {
   static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
   static StringTokenizer st;
   static int possibleCount = 1;
+  static Integer [] asc;
+  static Integer [] desc;
+  static int B;
 
-
-  public static void main(String[] args) throws IOException{
-
-
+  static void input() throws IOException{
     st = new StringTokenizer(br.readLine());
     int A = Integer.parseInt(st.nextToken());
-    int B = Integer.parseInt(st.nextToken());
+    B = Integer.parseInt(st.nextToken());
 
-    Integer [] asc = toArr(A);
+    asc = toArr(A);
     Arrays.sort(asc);
-    Integer [] desc = asc.clone();
-//    reversArray(desc, 0, desc.length-1);
-    Arrays.sort(desc, Collections.reverseOrder());
+    desc = asc.clone();
+    reversArray(desc, 0, desc.length-1);
+
+    for(int c = asc.length; c >= 1; c--) possibleCount *= c;
+  }
+
+  public static void main(String[] args) throws IOException{
+    input();
+
     if (!isStartZero(asc) && !isSmall(asc, B)) { //애초에 만들 수 있는 가장 작은 수가 B보다 크거나 같다면
       System.out.println(-1);
       return;
@@ -32,21 +38,16 @@ class Main {
       return;
     }
     boolean isExist = false;
-    for(int c = asc.length; c >= 1; c--) possibleCount *= c;
 
     while (possibleCount-- > 0){
       prevPermutation(desc);
-//      System.out.println(Arrays.toString(desc));
       if (isSmall(desc, B)) {
-//        System.out.println("isSmall "+ Arrays.toString(desc));
         isExist = true;
         break;
       }
     }
     int num = toIntFromArr(desc);
-//    System.out.println("num:"+num);
     System.out.println( ( !isExist || isStartZero(desc) )? -1 : num);
-
   }
 
   private static boolean isStartZero(Integer[] asc) {
@@ -73,7 +74,6 @@ class Main {
     for (int i =0; i< mv; i++){
       swap(array, from+i, to - i);
     }
-//    System.out.println(Arrays.toString(array));
   }
 
   private static boolean isSmall(Integer[] target, int stand){
@@ -81,7 +81,6 @@ class Main {
     return num < stand;
   }
   static Integer[] prevPermutation(Integer[] a){
-
     //맨뒤에서부터 첫번째 하향 지점을 찾는다.
     int i = a.length-1;
     while ( i > 0 && a[i - 1] <= a[i] ){
