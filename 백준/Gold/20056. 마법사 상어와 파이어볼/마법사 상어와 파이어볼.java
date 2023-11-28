@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,17 +14,6 @@ class Main{
       this.m = m;
       this.s = s;
       this.d = d;
-    }
-
-    @Override
-    public String toString() {
-      return "Ball{" +
-              "r=" + r +
-              ", c=" + c +
-              ", m=" + m +
-              ", s=" + s +
-              ", d=" + d +
-              '}';
     }
   }
 
@@ -52,11 +40,6 @@ class Main{
       Ball ball = new Ball(r, c, m, s, d);
       map[r][c].add(ball);
     }
-//    System.out.println("초기값 ");
-//    for (int i = 1; i <= N; i++) {
-//      System.out.println(Arrays.toString(map[i]));
-//    }
-//    System.out.println("------------");
   }
   static void initMap(List<Ball> [][] map){
     for (int i = 1; i <= N; i++) {
@@ -80,13 +63,8 @@ class Main{
     }
     //5.남아있는 파이어볼 질량의 합
     System.out.println(getRemainMass());
-
   }
   static void UnionBall(){
-//    System.out.println("UnionBall 전 ");
-//    for (int i = 1; i <= N; i++) {
-//      System.out.println(Arrays.toString(map[i]));
-//    }
     List<Ball> [][] newMap = new List[N+1][N+1];
     initMap(newMap);
     for (int i = 1; i <= N; i++) {
@@ -116,13 +94,7 @@ class Main{
 
       }
     }
-
     map = newMap;
-//    System.out.println("UnionBall 후 ");
-//    for (int i = 1; i <= N; i++) {
-//      System.out.println(Arrays.toString(map[i]));
-//    }
-
   }
   static void allMove(){
     List<Ball> [][] newMap = new List[N+1][N+1];
@@ -131,23 +103,15 @@ class Main{
       for (int j = 1; j <=N; j++){
         for( Ball fireBall : map[i][j]){
           //방향 및 속력만큼 이동,
-//          System.out.println("ball 이동 전 : "+fireBall);
           movedPoint(fireBall);
-//          System.out.println("ball 이동 후 : "+fireBall);
           newMap[fireBall.r][fireBall.c].add(fireBall);
-
         }
       }
     }
     map = newMap;
-//    System.out.println("all move 후 ");
-//    for (int i = 1; i <= N; i++) {
-//      System.out.println(Arrays.toString(map[i]));
-//    }
   }
   static int[][] dirs = {{-1,0}, {-1,1}, {0,1},{1,1}, {1,0}, {1,-1},{0,-1},{-1,-1}};
   static void movedPoint(Ball ball){
-    //N ball.r ball.c ball.s ball.d
     //1. 속력 만큼 이동
     ball.r += ball.s * dirs[ball.d][0];
     ball.c += ball.s * dirs[ball.d][1];
