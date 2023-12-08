@@ -4,16 +4,12 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-/**
-
- */
 class Main{
   static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
   static StringTokenizer st;
   static int D, P;
   static int [][] pipes;
   static int [] dp;
-
 
   static void input() throws IOException{
     st = new StringTokenizer(br.readLine());
@@ -27,30 +23,20 @@ class Main{
       int Ci = Integer.parseInt(st.nextToken());
       pipes[i] = new int[]{Li, Ci};
     }
-
   }
 
   static void sol(){
-
     for (int i = 1; i <= P; i++){
       int Li = pipes[i][0];
       int Ci = pipes[i][1];
-      int pre[] = new int[D+1];
-      pre[Li] = Math.max(Ci, dp[Li]);
-      for (int j = Li+1; j<=D; j++){
-        pre[j] = dp[j];
+      for (int j = D; j >= Li; j--){
         if (dp[j-Li] == 0) continue;
-        pre[j] = Math.max(pre[j],  Math.min(Ci, dp[j-Li]) );
+        dp[j] = Math.max(dp[j],  Math.min(Ci, dp[j-Li]) );
       }
-      for (int j = Li; j <=D ; j++) {
-        dp[j] = pre[j];
-      }
+      dp[Li] = Math.max(dp[Li], Ci);
     }
     System.out.println(dp[D]);
-//    System.out.println(Arrays.deepToString(dp));
   }
-
-
 
   public static void main(String[] args) throws IOException {
     input();
