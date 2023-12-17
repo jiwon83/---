@@ -4,9 +4,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-/*
 
- */
 public class Main {
   static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
   static StringTokenizer st;
@@ -30,6 +28,7 @@ public class Main {
           if (!inArea(x, y)) break L;
 //          System.out.println("x="+x+" y="+y);
           int amount = map[x][y];
+          if (amount==0) continue;
           map[x][y] = 0;
           sandSpread(map, x, y, d, amount);
         }
@@ -50,43 +49,23 @@ public class Main {
   static int nextDir(int d){
     return d-1 < 0 ? 3:d-1;
   }
-  static void printFilter(int [][] filter) {
-    for (int i = 0; i < filterN; i++){
-      System.out.println(Arrays.toString(filter[i]));
-    }
-  }
-  static void printMap() {
-    for (int i = 0; i < N; i++){
-      System.out.println(Arrays.toString(map[i]));
-    }
-  }
   static void sandSpread(int[][] map, int x, int y, int dir, int amount ){
     int [][] spreadFilter = toSpreadFilter(rateMap, amount);
-//    System.out.println(" spreadFilter ");
-//    printFilter(spreadFilter);
     int [][] rotated = rotate(spreadFilter, dir, filterN);
-//    System.out.println(" rotated ");
-//    printFilter(rotated);
-
     int [] trans = new int[]{x-f_center[0], y-f_center[1]};
     for (int i = 0; i < rotated.length; i++){
       for (int j = 0; j <rotated[0].length; j++){
+        if (rotated[i][j]==0) continue;
         int nx = i + trans[0];
         int ny = j + trans[1];
-//        System.out.println(" x :"+ nx+" y : "+ny + "에 "+ rotated[i][j]+ "적용");
         if (!inArea(nx, ny)) answer += rotated[i][j];
         else map[nx][ny] += rotated[i][j];
       }
     }
-//    System.out.println("filter 적용 후 map ");
-//    printMap();
-
   }
   static boolean inArea(int r, int c){
     return r >= 0 && c >= 0 && r < N && c <N;
-
   }
-
 
   private static int[][] rotate(int[][] spreadFilter, int dir, int filterN) {
 //    System.out.println("Main3.rotate");
@@ -111,13 +90,11 @@ public class Main {
 
   private static int[][] toSpreadFilter(int[][] rateMap, int amount) {
     int left = amount;
-//    System.out.println("Main3.toSpreadFilter");
     int [][] spreadFilter = new int[filterN][filterN];
     for (int i = 0; i< filterN; i++){
       for (int j = 0; j<filterN; j++){
         spreadFilter[i][j] += (int) (rateMap[i][j]*((double) amount / 100));
         left -= spreadFilter[i][j];
-//        System.out.println(amount + " 의 "+ rateMap[i][j]+"% = "+spreadFilter[i][j]);
       }
     }
     spreadFilter[1][2] = left;
@@ -138,6 +115,5 @@ public class Main {
     input();
     move(N, map);
     System.out.println(answer);
-
   }
 }
