@@ -1,123 +1,131 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+// javac t.java & java t
 
+import java.io.*;
+import java.util.*;
 
 public class Main {
-   static int N1,M1, N2,M2;
-   static char [][] map = new char[150+1][150+1];
-   static char [][] a, b;
-   static int answer;
+    static PrintWriter out = new PrintWriter(System.out);
 
-   static void printPuzzle(char[][] puzzle){
-      System.out.println(" ===== printPuzzle =====");
-      for (int i =0; i<puzzle.length; i++){
-         System.out.println(Arrays.toString(puzzle[i]));
-      }
-      System.out.println(" =====  ===== =====  =====");
+    static void rott(char a[][], int n, int m){
+        char tmp[][] =new char[n][m];
+        for(int i = 0; i < n; i++) for(int j = 0; j < m; j++) tmp[i][j] = a[i][j];
 
-   }
-   static void setA(char[][] map, char[][] a){
-      for (int i = 0; i<a.length; i++){
-         for (int j = 0; j <a[0].length; j++){
-            map[i+50][j+50] = a[i][j];
-         }
-      }
-   }
-
-   static void sol(){
-      setA(map, a);
-      for (int i = 0; i < 4; i++){
-
-//         System.out.println("---- rotate before ----");
-//         printPuzzle(b);
-
-         b = rotate(b);
-//         System.out.println("---- rotate after ----");
-//         printPuzzle(b);
-
-         for (int r = 0; r <=100; r++){
-            for (int c = 0; c <= 100; c++){
-               int area = setB(r, c, b, map);
-               if (area != -1) answer = Math.min(answer, area);
+        for(int i = 0; i < m; i++)
+            for(int j = 0; j < n; j++)
+                a[i][j] = tmp[n-1-j][i];
+    }
+    static boolean chk(char a1[][], int n1, int m1, char a2[][], int n2, int m2, int x, int y){
+        for(int i = 0; i < n1; i++){
+            for(int j = 0; j < m1; j++){
+                if(a1[i][j] == '0') continue;
+                int idx1 = i+x;
+                int idx2 = j+y;
+                if(0 <= idx1 && idx1 < n2 && 0 <= idx2 && idx2 < m2 && a2[idx1][idx2] == '1') return false;
             }
-         }
-      }
-      System.out.println(answer);
-   }
-   private static char[][] rotate(char[][] b){
-      // (c, -r)
-      char [][] temp = new char[b[0].length][b.length];
-      for (int i = 0; i< b.length; i++){
-         for (int j = 0; j <b[0].length; j++){
-            int nx = j;
-            int ny = b.length-1 - i;
-            temp[nx][ny] = b[i][j];
-         }
-      }
-      return temp;
-   }
-   private static int setB(int r, int c, char [][] b, char[][] map){
+        }
+        return true;
+    }
+    public static void main(String[] args) {
+        FastReader scan = new FastReader();
+        int n1, m1, n2, m2;
+        n1 = scan.nextInt(); m1 = scan.nextInt();
 
-      if (r == 51 && c == 51){
-//         System.out.println(" set B" );
-//         System.out.println(" r= "+ r + " c = "+ c );
-//         printPuzzle(b);
-      }
-//      System.out.println(" set B" );
-//      System.out.println(" r= "+ r + " c = "+ c );
-//      printPuzzle(map);
-//      printPuzzle(b);
+        char a1[][] = new char[100][100];
+        char a2[][] = new char[100][100];
 
-      int area = -1;
-      for (int i = 0; i <b.length; i++){
-         for (int j = 0; j<b[0].length; j++){
-            if( map[r + i][c + j] == '1' && b[i][j] =='1' ){
-               return area;
+        for(int i = 0; i < n1; i++){
+            String t = scan.next();
+            for(int j = 0; j < m1; j++) a1[i][j] = t.charAt(j);
+        }
+        n2 = scan.nextInt(); m2 = scan.nextInt();
+        for(int i = 0; i < n2; i++){
+            String t = scan.next();
+            for(int j = 0; j < m2; j++) a2[i][j] = t.charAt(j);
+        }
+
+        int ans = 99999999;
+        for(int rot = 0; rot < 4; rot++){
+            for(int x = -100; x <= 100; x++){
+                for(int y = -100; y <= 100; y++){
+                    int v1, v2;
+                    int l = Math.min(1, 1+x);
+                    int r = Math.max(n2, n1+x);
+                    v1 = r - l + 1;
+
+                    l = Math.min(1, 1+y);
+                    r = Math.max(m2, m1+y);
+                    v2 = r - l + 1;
+
+                    if(v1*v2 >= ans) continue;
+                    if(chk(a1, n1, m1, a2, n2, m2, x, y)){
+                        ans = v1 * v2;
+                    }
+                }
             }
-         }
-      }
-      int width = Math.max( c+b[0].length-1, 49+M1) - Math.min(c, 50) +1;
-      int height = Math.max( r+b.length-1, 49+N2) - Math.min(r, 50) +1;
-      if (r == 51 && c == 51){
-//         System.out.println("width:"+width+" height: "+ height);
-//         System.out.println("area = " + width*height);
-      }
-//      System.out.println("width:"+width+" height: "+ height);
-//      System.out.println("area = " + width*height);
-//      System.out.println("  set B  end  ");
-      return width*height;
-   }
+            rott(a1, n1, m1);
+            int tmp = n1;
+            n1 = m1;
+            m1 = tmp;
+        }
+        System.out.println(ans);
+    }
 
-   private static void input() throws IOException{
-      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-      StringTokenizer st = new StringTokenizer(br.readLine());
-      N1 = Integer.parseInt(st.nextToken());
-      M1 = Integer.parseInt(st.nextToken());
-      a = new char[N1][M1];
-      for (int i = 0; i<N1; i++){
-         String s = br.readLine();
-         for (int j = 0; j<M1; j++){
-            a[i][j] = s.charAt(j);
-         }
-      }
 
-      st = new StringTokenizer(br.readLine());
-      N2 = Integer.parseInt(st.nextToken());
-      M2 = Integer.parseInt(st.nextToken());
-      b = new char[N2][M2];
-      for (int i = 0; i<N2; i++){
-         String s = br.readLine();
-         for (int j = 0; j<M2; j++){
-            b[i][j] = s.charAt(j);
-         }
-      }
-      answer = (N1 + N2) * (M1+M2);
-   }
-   public static void main(String[] args) throws IOException {
-      input();
-      sol();
-   }
+
+    static class FastReader {
+        BufferedReader br;
+        StringTokenizer st;
+
+        public FastReader() {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+
+        public FastReader(String s) throws FileNotFoundException {
+            br = new BufferedReader(new FileReader(new File(s)));
+        }
+
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+
+        long nextLong() {
+            return Long.parseLong(next());
+        }
+
+        double nextDouble() {
+            return Double.parseDouble(next());
+        }
+
+        String nextLine() {
+            String str = "";
+            try {
+                str = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return str;
+        }
+    }
+    static class pair{
+        public long x, y;
+        pair(long x, long y){
+            this.x = x;
+            this.y = y;
+        }
+        pair(){
+            this.x = 0;
+            this.y = 0;
+        }
+    }
 }
