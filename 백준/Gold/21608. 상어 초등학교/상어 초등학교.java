@@ -1,195 +1,121 @@
-import java.io.*;
-import java.lang.reflect.Array;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.io.BufferedReader;
+import java.io.IOError;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.List;
 
+/*
+
+ */
 public class Main {
-    static class Seat implements Comparable<Seat>{
-        int r, c, cntLike, cntBlank;
-        public Seat(int r, int c){
-            this.r = r;
-            this.c = c;
-            cntLike =0;
-            cntBlank = 0;
-        }
-        int getScore(){
-            //cntLike에 따라서 만족도 반환
-            if (cntLike == 0) return 0;
-            else return (int) Math.pow(10, cntLike -1);
+  static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  static StringTokenizer st;
+  static StringBuilder sb = new StringBuilder();
+  static int [][] seat;
+  static HashSet<Integer> [] likeSet;
+  static int N;
+  static class Info{
+    int like, empty, r, c;
 
-        }
-        @Override
-        public int compareTo(Seat other){
-            if (this.cntLike != other.cntLike) return other.cntLike - this.cntLike;
-            if( this.cntBlank != other.cntBlank) return other.cntBlank - this.cntBlank;
-            if( this.r != other.r) return this.r - other.r;
-            else return this.c - other.c;
-        }
-        @Override
-        public String toString(){
-            return "r :"+r+" c: "+c+" cntLike: "+cntLike+" cntBlank: "+cntBlank;
-        }
-
+    public Info(int like, int empty, int r, int c) {
+      this.like = like;
+      this.empty = empty;
+      this.r = r;
+      this.c = c;
     }
-    static FastReader sc = new FastReader();
-    static int[][] info;
-    static int [][] classroom;
-    static int N;
-    static int totalScore = 0;
-    static int [] dx = {1,-1,0,0}, dy={0,0,-1,1};
-    static Seat [][] finalSeats;
-    static void pro(){
-        for(int i=0; i<N*N; i++){ //순서에 따라
-
-//            System.out.println("순서 : "+ i);
-//            for(int q = 0; q<N; q++){
-//                System.out.println(Arrays.toString(classroom[q]));
-//            }
-//            System.out.println("----------------"+ i);
-            int st = info[i][0];
-            // int [] likes =
-            List<Seat> seats = new ArrayList<>();
-            //1. 빈자리를 찾는다.
-            for (int j=0; j<N; j++){
-                for (int w = 0; w < N; w++){
-                    if( classroom[j][w] == 0) seats.add(new Seat(j, w));
-                }
-            }
-
-            //2. 모든 빈자리에 대하여
-            // 상하좌우에 좋아하는 학생수, 인접 빈칸 수, r,c를 구한다.
-            for(Seat seat : seats){
-                int x = seat.r;
-                int y = seat.c;
-                for(int j=0; j<4; j++){
-                    int nx = x + dx[j];
-                    int ny = y + dy[j];
-                    if( nx < 0 || ny < 0 || nx >=N || ny >= N) continue;
-                    if( isThereLike(i, nx,ny) ) seat.cntLike++;
-                    if( classroom[nx][ny]==0) seat.cntBlank++;
-                }
-            }
-
-            // 정렬
-            Collections.sort(seats);
-
-            //자리 배정
-            classroom[seats.get(0).r][seats.get(0).c] = st;
-
-//            System.out.println("자리 선정 완료");
-//            System.out.println(seats.get(0));
-
-            //갱신
-//            System.out.println("score "+ seats.get(0).cntLike +" -> "+ seats.get(0).getScore());
-//            totalScore += seats.get(0).getScore();
-
-        }
-        updateTotalScore();
-        System.out.println(totalScore);
+  }
+  static int [][] students;
+  private static void input() throws IOException{
+    N = Integer.parseInt(br.readLine());
+    seat = new int[N+1][N+1];
+    students = new int[N*N+1][5];
+    likeSet = new HashSet[N*N+1];
+    for (int i= 1; i <=N*N; i++){
+      likeSet[i] = new HashSet<>();
+      st = new StringTokenizer(br.readLine());
+      for (int j = 0; j <5; j++){
+        students[i][j] = Integer.parseInt(st.nextToken());
+      }
     }
-    static void updateTotalScore(){
-
-        for (int i=0; i<N; i++){
-//            System.out.println(Arrays.toString(classroom[i]));
-            for(int j=0; j<N; j++){
-                Seat seat = new Seat(i,j);
-                for(int d=0; d<4; d++){
-                    int nx = seat.r + dx[d];
-                    int ny = seat.c + dy[d];
-                    if( nx < 0 || ny < 0 || nx >=N || ny >= N) continue;
-                    //순서를 찾아라
-                    int stPos=-1;
-                    for(int o=0; o<N*N; o++){
-                        if(info[o][0]==classroom[i][j]){
-                            stPos = o;
-                            break;
-                        }
-                    }
-                    if( isThereLike(stPos, nx,ny) ) seat.cntLike++;
-                }
-//                System.out.println("( "+i+","+j+" ) " +"cntLike = "+ seat.cntLike+" getScore="+ seat.getScore());
-                totalScore += seat.getScore();
-            }
-        }
+    for (int i= 1; i <=N*N; i++){
+      int idx = students[i][0];
+      for (int j = 1; j <5; j++){
+        likeSet[idx].add(students[i][j]);
+      }
     }
-    static boolean isThereLike(int stIdx, int r, int c){
-        int [] likes = new int[] { info[stIdx][1] , info[stIdx][2], info[stIdx][3], info[stIdx][4]};
-        for (int friend : likes){
-            if(classroom[r][c] == friend) return true;
-        }
-        return false;
+  }
+
+  private static int sol(int[][] students){
+    //1. 모든 주어진 순서에 따라 학생들에 대하여
+    for (int i = 1; i <=N*N; i++){
+      int no = students[i][0];
+      //2. 비어있는 칸 중 탐색: 인접한 좋아하는 학생 수 , 빈칸 수
+      List<Info> selectInfo = getSelectInfo(students[i], seat);
+      //3. 우선순위에 따라 자리 선택
+      Collections.sort(selectInfo, (o1, o2) -> {
+        if (o1.like != o2.like) return o2.like-o1.like;
+        if (o1.empty != o2.empty) return o2.empty-o1.empty;
+        if(o1.r != o2.r) return o1.r - o2.r;
+        return o1.c - o2.c;
+      });
+      seat[selectInfo.get(0).r][selectInfo.get(0).c] = no;
     }
-    static void input(){
-        /*
-3
-4 2 5 1 7
-3 1 9 4 5
-9 8 1 2 3
-8 1 9 3 4
-7 2 3 4 8
-1 9 2 5 7
-6 5 2 3 4
-5 1 9 2 8
-2 9 3 1 4
-         */
-        N = sc.nextInt();
-        classroom = new int[N][N];
-        finalSeats = new Seat[N][N];
-        info = new int[N*N][5];
-        for (int i=0; i<N*N; i++){
-            for (int j=0; j<5; j++){
-                info[i][j] = sc.nextInt();
-            }
+    //4. 만족도를 구한다.
+    return getHappyScore(seat);
+  }
+  static int getHappy(int like){
+    return (int)Math.pow(10, like-1);
+  }
+  static int [] dr = {-1,1,0,0}, dc = {0,0,-1,1};
+  private static List<Info> getSelectInfo(int [] likes, int [][] seat){
+    List<Info> selectInfo = new ArrayList<>();
+    for (int r = 1; r <=N; r ++){
+        for (int c = 1; c <=N; c++){
+        if (seat[r][c] != 0) continue;
+        int like = 0;
+        int empty = 0;
+        for (int d = 0; d <4; d++){
+          int nr = r + dr[d];
+          int nc = c + dc[d];
+          if (!inArea(nr, nc)) continue;
+          if (likeSet[likes[0]].contains(seat[nr][nc])) like++;
+          if(seat[nr][nc]==0) empty++;
         }
-
+        selectInfo.add(new Info(like, empty,r,c));
+      }
     }
-    public static void main(String[] args) {
-        input();
-        pro();
-
+    return selectInfo;
+  }
+  private static int getLikeCnt(int [][] seat, int r, int c){
+    int no = seat[r][c];
+    int result = 0;
+    for (int d = 0; d <4; d++){
+      int nr = r + dr[d];
+      int nc = c + dc[d];
+      if (!inArea(nr, nc)) continue;
+      if (likeSet[no].contains(seat[nr][nc])) result++;
     }
-    static class FastReader {
-            BufferedReader br;
-            StringTokenizer st;
+    return result;
+  }
+  private static int getHappyScore(int [][] seat){
+    int score = 0;
+    for (int r = 1; r <=N; r ++) {
+      for (int c = 1; c <= N; c++) {
+        score += getHappy(getLikeCnt(seat, r, c));
+      }
+    }
+    return score;
+  }
+  private static boolean inArea(int r ,int c){
+    return r > 0 && c > 0 && r <= N && c <=N;
+  }
 
-            public FastReader() {
-                br = new BufferedReader(new InputStreamReader(System.in));
+  public static void main(String[] args) throws IOException {
+    input();
+    System.out.println(sol(students));
+  }
 
-            }
-            String next(){
-                while (st == null || !st.hasMoreTokens()){  //현재 남아 있는 토큰이 없다면 새로 받아온다.
-                    try {
-                        st = new StringTokenizer(br.readLine());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return st.nextToken();
-            }
-
-            int nextInt(){
-                return Integer.parseInt(next());
-            }
-            long nextLong(){return Long.parseLong(next()); }
-
-            double nextDouble(){return Double.parseDouble(next());}
-
-            String nextLine(){
-                String str ="";
-                try {
-                    str = br.readLine();
-
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-                return str;
-            }
-            void close() {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
 }
